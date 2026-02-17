@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminCMS\AdminCMSController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PublicCMS\PublicCMSController;
 use Illuminate\Http\Request;
@@ -26,4 +27,15 @@ Route::controller(PublicCMSController::class)->group(function () {
     Route::get('/projects/{slug}', 'getProjectBySlug');
     Route::get('/services', 'getServices');
     Route::post('/contact-submissions', 'submitContactForm');
+});
+
+Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+    // Site Metadata
+    Route::controller(AdminCMSController::class)->group(function () {
+        Route::get('/site-metadata', 'getSiteMetadata');
+        Route::put('/site-metadata', 'updateSiteMetadata');
+    });
+    // Footer
+    Route::get('/footer', [AdminCMSController::class, 'getFooter']);
+    Route::put('/footer', [AdminCMSController::class, 'updateFooter']);
 });
