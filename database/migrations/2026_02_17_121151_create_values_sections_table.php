@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('values_section', function (Blueprint $table) {
+        Schema::create('values_sections', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
             $table->timestamps();

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('process_steps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('process_section_id')->constrained('process_section')->onDelete('cascade');
+            $table->foreignId('process_section_id')->constrained('process_sections')->onDelete('cascade');
             $table->integer('sort_order')->default(0);
             $table->string('title');
             $table->text('description')->nullable();

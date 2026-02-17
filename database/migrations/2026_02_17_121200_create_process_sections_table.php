@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('process_section', function (Blueprint $table) {
+        Schema::create('process_sections', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
             $table->foreignId('image_media_id')->nullable()->constrained('media')->onDelete('set null');
