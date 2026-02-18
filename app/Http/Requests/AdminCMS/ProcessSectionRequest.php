@@ -18,7 +18,14 @@ class ProcessSectionRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            // 🔹 Switch Existing Media (optional)
             'image_media_id' => 'nullable|exists:media,id',
+
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            // 🔹 Media Meta
+            'alt_text' => 'nullable|string|max:255',
+            'image_title' => 'nullable|string|max:255',
 
             'steps' => 'required|array',
             'steps.*.id' => 'nullable|exists:process_steps,id',

@@ -19,7 +19,13 @@ class AboutSectionRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'image_media_id' => 'nullable|exists:media,id',
+
+            // ✅ upload file (optional)
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            // ✅ update media meta (optional)
+            'alt_text' => 'nullable|string|max:255',
+            'image_title' => 'nullable|string|max:255',
         ];
     }
 
@@ -27,8 +33,21 @@ class AboutSectionRequest extends FormRequest
     {
         return [
             'title.required' => 'About section title is required.',
+            'title.string' => 'Title must be a string.',
+            'title.max' => 'Title must not exceed 255 characters.',
+
             'description.required' => 'About section description is required.',
-            'image_media_id.exists' => 'Selected image is invalid.',
+            'description.string' => 'Description must be a string.',
+
+            'image.image' => 'The uploaded file must be an image.',
+            'image.mimes' => 'Image must be jpg, jpeg, png, or webp.',
+            'image.max' => 'Image size must not exceed 2MB.',
+
+            'alt_text.string' => 'Alt text must be a string.',
+            'alt_text.max' => 'Alt text must not exceed 255 characters.',
+
+            'image_title.string' => 'Image title must be a string.',
+            'image_title.max' => 'Image title must not exceed 255 characters.',
         ];
     }
 

@@ -2,11 +2,16 @@
 
 namespace App\Services\AdminAuthCMS;
 
+use App\Models\Media;
 use App\Models\ProcessSection;
 use App\Models\ProcessStep;
+use App\Traits\UploadImage;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessSectionService
 {
+    use UploadImage;
+
     /*
     |--------------------------------------------------------------------------
     | GET
@@ -42,16 +47,109 @@ class ProcessSectionService
         $section = ProcessSection::first();
 
         if (! $section) {
-            $section = ProcessSection::create([
-                'title' => $request->title,
-                'image_media_id' => $request->image_media_id,
-            ]);
-        } else {
-            $section->update([
-                'title' => $request->title,
-                'image_media_id' => $request->image_media_id,
+            return [
+                'data' => null,
+                'message' => 'Process section not found',
+                'code' => 404,
+            ];
+        }
+        if ($request->hasFile('image')) {
+
+            $upload = $this->uploadImage($request, 'process', 'image');
+
+            if (! $upload['success']) {
+                return [
+                    'data' => null,
+                    'message' => $upload['message'],
+                    'code' => 400,
+                ];
+            }
+
+            $newPath = $upload['data'];
+
+            $filePath = storage_path('app/public/'.$newPath);
+            $imageSize = getimagesize($filePath);
+
+            /*
+            |--------------------------------------------------------------------------
+            | If Media Exists → Update Same Media ID
+            |--------------------------------------------------------------------------
+            */
+            if ($section->image) {
+
+                // delete old physical file
+                if (Storage::disk('public')->exists($section->image->path)) {
+                    Storage::disk('public')->delete($section->image->path);
+                }
+
+                $section->image->update([
+                    'path' => $newPath,
+                    'mime_type' => mime_content_type($filePath),
+                    'size_bytes' => filesize($filePath),
+                    'width' => $imageSize[0] ?? null,
+                    'height' => $imageSize[1] ?? null,
+                    'alt_text' => $request->alt_text ?? $section->image->alt_text,
+                    'title' => $request->image_title ?? $section->image->title,
+                ]);
+
+            } else {
+                /*
+                |--------------------------------------------------------------------------
+                | First Time Image
+                |--------------------------------------------------------------------------
+                */
+                $media = Media::create([
+                    'path' => $newPath,
+                    'type' => 'image',
+                    'mime_type' => mime_content_type($filePath),
+                    'size_bytes' => filesize($filePath),
+                    'width' => $imageSize[0] ?? null,
+                    'height' => $imageSize[1] ?? null,
+                    'alt_text' => $request->alt_text ?? 'About image',
+                    'title' => $request->image_title ?? 'About image',
+                ]);
+
+                $section->image_media_id = $media->id;
+            }
+        } elseif ($section->image) {
+            /*
+            |--------------------------------------------------------------------------
+            | Update Only Media Meta (No New File)
+            |--------------------------------------------------------------------------
+            */
+            $section->image->update([
+                'alt_text' => $request->alt_text ?? $section->image->alt_text,
+                'title' => $request->image_title ?? $section->image->title,
             ]);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Case 2: Admin Sends image_media_id (Switch Existing Media)
+        |--------------------------------------------------------------------------
+        */
+        elseif ($request->filled('image_media_id')) {
+
+            // Optional: validate it exists
+            $media = Media::find($request->image_media_id);
+
+            if (! $media) {
+                return [
+                    'data' => null,
+                    'message' => 'Selected image not found',
+                    'code' => 404,
+                ];
+            }
+
+            $section->image_media_id = $media->id;
+        }
+
+        $section->save();
+
+        $section->update([
+            'title' => $request->title,
+
+        ]);
 
         /*
         |--------------------------------------------------------------------------
