@@ -75,4 +75,13 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::put('/services/{id}', [ServiceController::class, 'updateService']);
     Route::get('/services/{id}', [ServiceController::class, 'getServiceById']);
     Route::delete('/services/{id}', [ServiceController::class, 'deleteService']);
+
+    // Values Section
+    Route::get('/values', [AdminCMSController::class, 'getValuesSection']);
+    Route::put('/values', [AdminCMSController::class, 'updateValuesSection']);
+
+    // Process Section
+    Route::get('/process', [AdminCMSController::class, 'getProcessSection']);
+    Route::put('/process', [AdminCMSController::class, 'updateProcessSection']);
+
 });

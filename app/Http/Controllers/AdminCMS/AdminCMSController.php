@@ -5,15 +5,19 @@ namespace App\Http\Controllers\AdminCMS;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCMS\FooterRequest;
 use App\Http\Requests\AdminCMS\HeroRequest;
+use App\Http\Requests\AdminCMS\ProcessSectionRequest;
 use App\Http\Requests\AdminCMS\ProjectsSectionRequest;
 use App\Http\Requests\AdminCMS\ServicesSectionRequest;
 use App\Http\Requests\AdminCMS\SiteMetadataRequest;
+use App\Http\Requests\AdminCMS\ValuesSectionRequest;
 use App\Http\Responses\Response;
 use App\Services\AdminAuthCMS\FooterService;
 use App\Services\AdminAuthCMS\HeroService;
+use App\Services\AdminAuthCMS\ProcessSectionService;
 use App\Services\AdminAuthCMS\ProjectsSectionService;
 use App\Services\AdminAuthCMS\ServicesSectionService;
 use App\Services\AdminAuthCMS\SiteMetadataService;
+use App\Services\AdminAuthCMS\ValuesSectionService;
 use Throwable;
 
 class AdminCMSController extends Controller
@@ -28,13 +32,19 @@ class AdminCMSController extends Controller
 
     public $servicesSectionService;
 
-    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService, ServicesSectionService $servicesSectionService)
+    public $valuesSectionService;
+
+    public $processSectionService;
+
+    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService, ServicesSectionService $servicesSectionService, ValuesSectionService $valuesSectionService, ProcessSectionService $processSectionService)
     {
         $this->siteMetadataService = $siteMetadataService;
         $this->footerService = $footerService;
         $this->heroService = $heroService;
         $this->projectsSectionService = $projectsSectionService;
         $this->servicesSectionService = $servicesSectionService;
+        $this->valuesSectionService = $valuesSectionService;
+        $this->processSectionService = $processSectionService;
     }
 
     /*
@@ -176,7 +186,7 @@ class AdminCMSController extends Controller
 
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error fetching services section', 500);
+            return Response::Error('Error fetching services section', $th->getMessage(), 500);
         }
     }
 
@@ -190,7 +200,78 @@ class AdminCMSController extends Controller
 
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error updating services section', 500);
+            return Response::Error('Error updating services section', $th->getMessage(), 500);
+        }
+    }
+
+    /*
+    =================
+    Values Section
+    =================
+    */
+
+    public function getValuesSection()
+    {
+        try {
+            $data = $this->valuesSectionService->getValuesSection();
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching values section', $th->getMessage(), 500);
+        }
+    }
+
+    public function updateValuesSection(ValuesSectionRequest $request)
+    {
+        try {
+            $data = $this->valuesSectionService->updateValuesSection($request);
+
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating values section', $th->getMessage(), 500);
+        }
+    }
+
+    /*
+    =================
+    process Section
+    =================
+    */
+
+    public function getProcessSection()
+    {
+        try {
+            $data = $this->processSectionService->getProcessSection();
+
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching process section', $th->getMessage(), 500);
+        }
+    }
+
+    public function updateProcessSection(ProcessSectionRequest $request)
+    {
+        try {
+            $data = $this->processSectionService->updateProcessSection($request);
+
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating process section', $th->getMessage(), 500);
         }
     }
 }
