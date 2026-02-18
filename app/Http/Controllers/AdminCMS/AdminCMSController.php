@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCMS\FooterRequest;
 use App\Http\Requests\AdminCMS\HeroRequest;
 use App\Http\Requests\AdminCMS\ProjectsSectionRequest;
+use App\Http\Requests\AdminCMS\ServicesSectionRequest;
 use App\Http\Requests\AdminCMS\SiteMetadataRequest;
 use App\Http\Responses\Response;
 use App\Services\AdminAuthCMS\FooterService;
 use App\Services\AdminAuthCMS\HeroService;
 use App\Services\AdminAuthCMS\ProjectsSectionService;
+use App\Services\AdminAuthCMS\ServicesSectionService;
 use App\Services\AdminAuthCMS\SiteMetadataService;
 use Throwable;
 
@@ -24,12 +26,15 @@ class AdminCMSController extends Controller
 
     public $projectsSectionService;
 
-    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService)
+    public $servicesSectionService;
+
+    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService, ServicesSectionService $servicesSectionService)
     {
         $this->siteMetadataService = $siteMetadataService;
         $this->footerService = $footerService;
         $this->heroService = $heroService;
         $this->projectsSectionService = $projectsSectionService;
+        $this->servicesSectionService = $servicesSectionService;
     }
 
     /*
@@ -152,6 +157,40 @@ class AdminCMSController extends Controller
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             return Response::Error('Error updating projects section', $th->getMessage());
+        }
+    }
+
+    /*
+    =================
+    services section
+    =================
+    */
+
+    public function getServicesSection()
+    {
+        try {
+            $data = $this->servicesSectionService->getServicesSection();
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching services section', 500);
+        }
+    }
+
+    public function updateServicesSection(ServicesSectionRequest $request)
+    {
+        try {
+            $data = $this->servicesSectionService->updateServicesSection($request);
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating services section', 500);
         }
     }
 }

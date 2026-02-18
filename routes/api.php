@@ -63,4 +63,8 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::put('/categories/{id}', [CategoryController::class, 'updateCategory']);
     Route::get('/categories/{id}', [CategoryController::class, 'getCategoryById']);
     Route::delete('/categories/{id}', [CategoryController::class, 'deleteCategory']);
+
+    // Services Section
+    Route::get('/services-section', [AdminCMSController::class, 'getServicesSection']);
+    Route::put('/services-section', [AdminCMSController::class, 'updateServicesSection']);
 });
