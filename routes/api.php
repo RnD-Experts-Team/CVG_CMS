@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminCMS\AdminCMSController;
 use App\Http\Controllers\AdminCMS\CategoryController;
 use App\Http\Controllers\AdminCMS\ProjectController;
+use App\Http\Controllers\AdminCMS\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PublicCMS\PublicCMSController;
 use Illuminate\Http\Request;
@@ -67,4 +68,11 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     // Services Section
     Route::get('/services-section', [AdminCMSController::class, 'getServicesSection']);
     Route::put('/services-section', [AdminCMSController::class, 'updateServicesSection']);
+
+    // Services CRUD
+    Route::get('/services', [ServiceController::class, 'getAllServices']);
+    Route::post('/services', [ServiceController::class, 'createService']);
+    Route::put('/services/{id}', [ServiceController::class, 'updateService']);
+    Route::get('/services/{id}', [ServiceController::class, 'getServiceById']);
+    Route::delete('/services/{id}', [ServiceController::class, 'deleteService']);
 });
