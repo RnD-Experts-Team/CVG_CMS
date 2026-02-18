@@ -14,7 +14,7 @@ class MediaSeeder extends Seeder
     {
         Media::create([
             'path' => 'path/to/logo.png',
-            'url' => 'https://example.com/logo.png',
+            // 'url' => 'https://example.com/logo.png',
             'type' => 'image',
             'mime_type' => 'image/png',
             'width' => 150,
@@ -27,7 +27,7 @@ class MediaSeeder extends Seeder
         // Insert sample favicon media
         Media::create([
             'path' => 'path/to/favicon.ico',
-            'url' => 'https://example.com/favicon.ico',
+            // 'url' => 'https://example.com/favicon.ico',
             'type' => 'image',
             'mime_type' => 'image/x-icon',
             'width' => 32,

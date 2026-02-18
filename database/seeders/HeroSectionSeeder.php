@@ -26,7 +26,7 @@ class HeroSectionSeeder extends Seeder
         $media1 = Media::create([
             'type' => 'image',
             'path' => 'path/to/image1.jpg',
-            'url' => 'https://example.com/image1.jpg',
+            // 'url' => 'https://example.com/image1.jpg',
             'mime_type' => 'image/jpeg',
             'width' => 800,
             'height' => 600,
@@ -38,7 +38,7 @@ class HeroSectionSeeder extends Seeder
         $media2 = Media::create([
             'type' => 'image',
             'path' => 'path/to/image2.jpg',
-            'url' => 'https://example.com/image2.jpg',
+            // 'url' => 'https://example.com/image2.jpg',
             'mime_type' => 'image/jpeg',
             'width' => 800,
             'height' => 600,

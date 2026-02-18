@@ -7,9 +7,32 @@ use Illuminate\Database\Eloquent\Model;
 class Media extends Model
 {
     protected $fillable = [
-        'disk', 'path', 'url', 'type', 'mime_type',
-        'width', 'height', 'size_bytes', 'alt_text', 'title',
+        'path',
+        'type',
+        'mime_type',
+        'width',
+        'height',
+        'size_bytes',
+        'alt_text',
+        'title',
     ];
+
+    /**
+     * Append computed url automatically
+     */
+    protected $appends = ['url'];
+
+    /**
+     * ✅ Calculate full URL dynamically
+     */
+    public function getUrlAttribute(): ?string
+    {
+        if (! $this->path) {
+            return null;
+        }
+
+        return asset('storage/'.$this->path);
+    }
 
     public function heroSections()
     {

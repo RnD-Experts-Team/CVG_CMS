@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('media', function (Blueprint $table) {
             $table->id();
-            $table->string('disk', 50)->default('public');
+            // $table->string('disk', 50)->default('public');
             $table->string('path', 512);
-            $table->string('url', 1024)->nullable();
+            // $table->string('url', 1024)->nullable();
             $table->enum('type', ['image', 'video', 'file'])->default('image');
             $table->string('mime_type', 100)->nullable();
             $table->unsignedInteger('width')->nullable();
