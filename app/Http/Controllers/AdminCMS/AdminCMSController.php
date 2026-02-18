@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\AdminCMS;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminCMS\AboutSectionRequest;
+use App\Http\Requests\AdminCMS\ContactSectionRequest;
 use App\Http\Requests\AdminCMS\FooterRequest;
 use App\Http\Requests\AdminCMS\HeroRequest;
 use App\Http\Requests\AdminCMS\ProcessSectionRequest;
@@ -11,6 +13,9 @@ use App\Http\Requests\AdminCMS\ServicesSectionRequest;
 use App\Http\Requests\AdminCMS\SiteMetadataRequest;
 use App\Http\Requests\AdminCMS\ValuesSectionRequest;
 use App\Http\Responses\Response;
+use App\Services\AdminAuthCMS\AboutSectionService;
+use App\Services\AdminAuthCMS\ContactSectionService;
+use App\Services\AdminAuthCMS\ContactSubmissionService;
 use App\Services\AdminAuthCMS\FooterService;
 use App\Services\AdminAuthCMS\HeroService;
 use App\Services\AdminAuthCMS\ProcessSectionService;
@@ -36,7 +41,13 @@ class AdminCMSController extends Controller
 
     public $processSectionService;
 
-    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService, ServicesSectionService $servicesSectionService, ValuesSectionService $valuesSectionService, ProcessSectionService $processSectionService)
+    public $aboutSectionService;
+
+    public $contactSectionService;
+
+    public $contactSubmissionService;
+
+    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService, ServicesSectionService $servicesSectionService, ValuesSectionService $valuesSectionService, ProcessSectionService $processSectionService, AboutSectionService $aboutSectionService, ContactSectionService $contactSectionService, ContactSubmissionService $contactSubmissionService)
     {
         $this->siteMetadataService = $siteMetadataService;
         $this->footerService = $footerService;
@@ -45,6 +56,9 @@ class AdminCMSController extends Controller
         $this->servicesSectionService = $servicesSectionService;
         $this->valuesSectionService = $valuesSectionService;
         $this->processSectionService = $processSectionService;
+        $this->aboutSectionService = $aboutSectionService;
+        $this->contactSectionService = $contactSectionService;
+        $this->contactSubmissionService = $contactSubmissionService;
     }
 
     /*
@@ -272,6 +286,117 @@ class AdminCMSController extends Controller
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             return Response::Error('Error updating process section', $th->getMessage(), 500);
+        }
+    }
+    /*
+    =================
+    About Section
+    =================
+    */
+
+    public function getAboutSection()
+    {
+        try {
+            $data = $this->aboutSectionService->getAboutSection();
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching about section', $th->getMessage(), 500);
+        }
+    }
+
+    public function updateAboutSection(AboutSectionRequest $request)
+    {
+        try {
+            $data = $this->aboutSectionService->updateAboutSection($request);
+
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating about section', $th->getMessage(), 500);
+        }
+    }
+
+    /*
+    =================
+    contact Section
+    =================
+    */
+
+    public function getContactSection()
+    {
+        try {
+            $data = $this->contactSectionService->getContactSection();
+
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching contact section', $th->getMessage(), 500);
+        }
+    }
+
+    public function updateContactSection(ContactSectionRequest $request)
+    {
+        try {
+            $data = $this->contactSectionService->updateContactSection($request);
+            if ($data['code'] !== 200) {
+                return Response::Error($data['message'], null, $data['code']);
+            }
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating contact section', $th->getMessage(), 500);
+        }
+    }
+
+    /*
+    =================
+    contact Submitions
+    =================
+    */
+
+    public function getAll()
+    {
+        try {
+            $data = $this->contactSubmissionService->getAllSubmissions();
+
+            return Response::paginate(
+                $data['data'],
+                $data['message'],
+                $data['code']
+            );
+
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching contact submissions', $th->getMessage(), 500);
+        }
+    }
+
+    public function getById($id)
+    {
+        try {
+            $data = $this->contactSubmissionService->getSubmissionById($id);
+
+            if ($data['code'] === 404) {
+                return Response::Error($data['message'], null, 404);
+            }
+
+            return Response::Success(
+                $data['data'],
+                $data['message'],
+                $data['code']
+            );
+
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching contact submission', $th->getMessage(), 500);
         }
     }
 }

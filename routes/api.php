@@ -84,4 +84,15 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::get('/process', [AdminCMSController::class, 'getProcessSection']);
     Route::put('/process', [AdminCMSController::class, 'updateProcessSection']);
 
+    // About Section
+    Route::get('/about', [AdminCMSController::class, 'getAboutSection']);
+    Route::put('/about', [AdminCMSController::class, 'updateAboutSection']);
+
+    // contact Section
+    Route::get('/contact-section', [AdminCMSController::class, 'getContactSection']);
+    Route::put('/contact-section', [AdminCMSController::class, 'updateContactSection']);
+
+    // contact Submissions
+    Route::get('/contact-submissions', [AdminCMSController::class, 'getAll']);
+    Route::get('/contact-submissions/{id}', [AdminCMSController::class, 'getById']);
 });
