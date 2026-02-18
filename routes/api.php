@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminCMS\AdminCMSController;
+use App\Http\Controllers\AdminCMS\CategoryController;
 use App\Http\Controllers\AdminCMS\ProjectController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PublicCMS\PublicCMSController;
@@ -55,4 +56,11 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::get('/projects/{id}', [ProjectController::class, 'getProjectById']);
     Route::put('/projects/{id}', [ProjectController::class, 'updateProject']);
     Route::delete('/projects/{id}', [ProjectController::class, 'deleteProject']);
+
+    // Categories CRUD
+    Route::get('/categories', [CategoryController::class, 'getAllCategories']);
+    Route::post('/categories', [CategoryController::class, 'createCategory']);
+    Route::put('/categories/{id}', [CategoryController::class, 'updateCategory']);
+    Route::get('/categories/{id}', [CategoryController::class, 'getCategoryById']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'deleteCategory']);
 });
