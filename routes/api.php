@@ -35,7 +35,16 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::get('/site-metadata', 'getSiteMetadata');
         Route::put('/site-metadata', 'updateSiteMetadata');
     });
+
     // Footer
     Route::get('/footer', [AdminCMSController::class, 'getFooter']);
     Route::put('/footer', [AdminCMSController::class, 'updateFooter']);
+
+    // Hero Section
+    Route::get('/hero', [AdminCMSController::class, 'getHero']);
+    Route::put('/hero', [AdminCMSController::class, 'updateHero']);
+
+    // Projects Section
+    Route::get('/projects-section', [AdminCMSController::class, 'getProjectsSection']);
+    Route::put('/projects-section', [AdminCMSController::class, 'updateProjectsSection']);
 });

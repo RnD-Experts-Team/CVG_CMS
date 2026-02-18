@@ -4,9 +4,13 @@ namespace App\Http\Controllers\AdminCMS;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCMS\FooterRequest;
+use App\Http\Requests\AdminCMS\HeroRequest;
+use App\Http\Requests\AdminCMS\ProjectsSectionRequest;
 use App\Http\Requests\AdminCMS\SiteMetadataRequest;
 use App\Http\Responses\Response;
 use App\Services\AdminAuthCMS\FooterService;
+use App\Services\AdminAuthCMS\HeroService;
+use App\Services\AdminAuthCMS\ProjectsSectionService;
 use App\Services\AdminAuthCMS\SiteMetadataService;
 use Throwable;
 
@@ -16,10 +20,16 @@ class AdminCMSController extends Controller
 
     public $footerService;
 
-    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService)
+    public $heroService;
+
+    public $projectsSectionService;
+
+    public function __construct(SiteMetadataService $siteMetadataService, FooterService $footerService, HeroService $heroService, ProjectsSectionService $projectsSectionService)
     {
         $this->siteMetadataService = $siteMetadataService;
         $this->footerService = $footerService;
+        $this->heroService = $heroService;
+        $this->projectsSectionService = $projectsSectionService;
     }
 
     /*
@@ -82,6 +92,66 @@ class AdminCMSController extends Controller
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             return Response::Error('Error updating footer', $th->getMessage());
+        }
+    }
+
+    /*
+    =================
+    hero section
+    =================
+    */
+
+    // Get Hero Section with media
+    public function getHero()
+    {
+        try {
+            $data = $this->heroService->getHero();
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching hero section', $th->getMessage());
+        }
+    }
+
+    // Update Hero Section with media
+    public function updateHero(HeroRequest $request)
+    {
+        try {
+            $data = $this->heroService->updateHero($request);
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating hero section', $th->getMessage());
+        }
+    }
+
+    /*
+    =================
+    projects section
+    =================
+    */
+
+    // Get Projects Section (Singleton)
+    public function getProjectsSection()
+    {
+        try {
+            $data = $this->projectsSectionService->getProjectsSection();
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching projects section', $th->getMessage());
+        }
+    }
+
+    // Update Projects Section (Singleton)
+    public function updateProjectsSection(ProjectsSectionRequest $request)
+    {
+        try {
+            $data = $this->projectsSectionService->updateProjectsSection($request);
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error updating projects section', $th->getMessage());
         }
     }
 }
