@@ -30,12 +30,18 @@ class FooterRequest extends FormRequest
             'contact.whatsapp' => 'required|string',
             'contact.email' => 'required|email',
             'contact.address' => 'required|string',
+
             'social_links' => 'required|array',
-            'social_links.*.platform' => 'required|string',
+            'social_links.*.platform' => 'required|string|in:facebook,instagram,linkedin,whatsapp,fountain,indeed,youtube', // Optional: Adjust as needed
             'social_links.*.url' => 'required|url',
         ];
     }
 
+    /**
+     * Custom validation messages.
+     *
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [
@@ -49,10 +55,12 @@ class FooterRequest extends FormRequest
             'contact.email.email' => 'The email address must be a valid email format.',
             'contact.address.required' => 'The address is required.',
             'contact.address.string' => 'The address must be a valid string.',
+
             'social_links.required' => 'The social links are required.',
             'social_links.array' => 'The social links must be an array.',
             'social_links.*.platform.required' => 'Each social link must have a platform.',
             'social_links.*.platform.string' => 'Each social link platform must be a valid string.',
+            'social_links.*.platform.in' => 'Each social link must be one of the following: facebook, instagram, linkedin, whatsapp, fountain, indeed, youtube.',
             'social_links.*.url.required' => 'Each social link must have a URL.',
             'social_links.*.url.url' => 'Each social link URL must be a valid URL.',
         ];
