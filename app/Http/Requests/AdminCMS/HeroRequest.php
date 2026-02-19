@@ -17,32 +17,35 @@ class HeroRequest extends FormRequest
         return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string',
-            'button_text' => 'nullable|string|max:100',
-            'button_link' => 'nullable|url',
-            'media' => 'required|array',
-            'media.*.media_id' => 'required|exists:media,id',
-            'media.*.sort_order' => 'required|integer',
+            'subtitle' => 'required|string|max:255',
+            'button_text' => 'required|string|max:100',
+            'button_link' => 'required|url',
+            'media' => 'nullable|array', // Media is optional
+            'media.*.file' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image file validation
+            'media.*.alt_text' => 'nullable|string|max:255',
+            'media.*.title' => 'nullable|string|max:255',
+            'media.*.sort_order' => 'nullable|integer|min:0', // Sort order validation
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
-            'title.required' => 'The title is required.',
-            'title.string' => 'The title must be a string.',
-            'subtitle.string' => 'The subtitle must be a string.',
-            'button_text.string' => 'The button text must be a string.',
+            'title.required' => 'The title is required for the hero section.',
+            'subtitle.required' => 'The subtitle is required for the hero section.',
+            'button_text.required' => 'The button text is required.',
+            'button_link.required' => 'The button link is required.',
             'button_link.url' => 'The button link must be a valid URL.',
-            'media.required' => 'The media field is required.',
-            'media.array' => 'The media must be an array.',
-            'media.*.media_id.required' => 'Each media must have a media ID.',
-            'media.*.media_id.exists' => 'Each media ID must exist in the media table.',
-            'media.*.sort_order.required' => 'Each media must have a sort order.',
+            'media.array' => 'The media field must be an array.',
+            'media.*.file.required' => 'Each media file is required.',
+            'media.*.file.mimes' => 'Each media file must be a valid image (jpg, jpeg, png, gif).',
+            'media.*.file.max' => 'Each media file size must not exceed 2MB.',
+            'media.*.alt_text.string' => 'The alt text must be a valid string.',
+            'media.*.title.string' => 'The title must be a valid string.',
             'media.*.sort_order.integer' => 'The sort order must be an integer.',
         ];
     }
