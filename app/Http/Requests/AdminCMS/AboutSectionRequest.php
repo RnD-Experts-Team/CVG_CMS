@@ -21,7 +21,7 @@ class AboutSectionRequest extends FormRequest
             'description' => 'required|string',
 
             // ✅ upload file (optional)
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048',
 
             // ✅ update media meta (optional)
             'alt_text' => 'nullable|string|max:255',
@@ -39,8 +39,7 @@ class AboutSectionRequest extends FormRequest
             'description.required' => 'About section description is required.',
             'description.string' => 'Description must be a string.',
 
-            'image.image' => 'The uploaded file must be an image.',
-            'image.mimes' => 'Image must be jpg, jpeg, png, or webp.',
+            'image.mimes' => 'Image must be jpg, jpeg, png, webp, mp4, avi, mov, mpg, webm or pdf.',
             'image.max' => 'Image size must not exceed 2MB.',
 
             'alt_text.string' => 'Alt text must be a string.',

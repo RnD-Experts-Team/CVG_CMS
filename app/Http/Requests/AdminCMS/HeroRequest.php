@@ -25,7 +25,7 @@ class HeroRequest extends FormRequest
             'button_text' => 'required|string|max:100',
             'button_link' => 'required|url',
             'media' => 'nullable|array', // Media is optional
-            'media.*.file' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image file validation
+            'media.*.file' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048',
             'media.*.alt_text' => 'nullable|string|max:255',
             'media.*.title' => 'nullable|string|max:255',
             'media.*.sort_order' => 'nullable|integer|min:0', // Sort order validation
@@ -42,7 +42,7 @@ class HeroRequest extends FormRequest
             'button_link.url' => 'The button link must be a valid URL.',
             'media.array' => 'The media field must be an array.',
             'media.*.file.required' => 'Each media file is required.',
-            'media.*.file.mimes' => 'Each media file must be a valid image (jpg, jpeg, png, gif).',
+            'media.*.file.mimes' => 'Each media file must be a valid file (jpg, jpeg, png, webp, mp4, avi, mov, mpg, webm or pdf).',
             'media.*.file.max' => 'Each media file size must not exceed 2MB.',
             'media.*.alt_text.string' => 'The alt text must be a valid string.',
             'media.*.title.string' => 'The title must be a valid string.',
