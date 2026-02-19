@@ -18,23 +18,28 @@ class ValuesSectionRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-
             'values' => 'required|array',
-            'values.*.id' => 'nullable|exists:values_items,id',
             'values.*.title' => 'required|string|max:255',
             'values.*.description' => 'nullable|string',
-            'values.*.media_id' => 'nullable|exists:media,id',
+            'values.*.media_id' => 'nullable|exists:media,id',  // Allow existing media ID
+            'values.*.image' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:10240', // Max size of 10MB
             'values.*.sort_order' => 'nullable|integer',
+            'values.*.alt_text' => 'nullable|string|max:255',
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
-            'title.required' => 'Section title is required.',
-            'values.required' => 'Values array is required.',
+            'title.required' => 'The title is required.',
+            'values.required' => 'The values array is required.',
             'values.*.title.required' => 'Each value must have a title.',
-            'values.*.media_id.exists' => 'Selected media is invalid.',
+            'values.*.image.file' => 'The image must be a valid file.',
+            'values.*.image.mimes' => 'The image must be a file of type: jpg, jpeg, png, gif.',
+            'values.*.image.max' => 'The image may not be greater than 10MB.',
+            'values.*.alt_text.string' => 'The alt text must be a string.',
+            'values.*.alt_text.max' => 'The alt text may not be greater than 255 characters.',
+            'values.*.sort_order.integer' => 'The sort order must be an integer.',
         ];
     }
 
