@@ -25,24 +25,32 @@ class SiteMetadataRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'keywords' => 'nullable|string',
-            'logo_media_id' => 'nullable|exists:media,id',
-            'favicon_media_id' => 'nullable|exists:media,id',
+            'logo' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image validation for logo
+            'favicon' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image validation for favicon
+            'logo_alt_text' => 'nullable|string|max:255',
+            'logo_title' => 'nullable|string|max:255',
+            'favicon_alt_text' => 'nullable|string|max:255',
+            'favicon_title' => 'nullable|string|max:255',
         ];
     }
 
-    public function messages(): array
+    public function messages()
     {
         return [
-            'name.required' => 'The site name is required.',
-            'name.string' => 'The site name must be a string.',
-            'name.max' => 'The site name should not exceed 255 characters.',
-            'description.string' => 'The description must be a string.',
-            'keywords.string' => 'The keywords must be a string.',
-            'logo_media_id.exists' => 'The logo media ID must exist in the media table.',
-            'favicon_media_id.exists' => 'The favicon media ID must exist in the media table.',
+            'title.required' => 'The site title is required.',
+            'logo.file' => 'The logo must be a valid image file.',
+            'favicon.file' => 'The favicon must be a valid image file.',
+            'logo.mimes' => 'The logo must be a jpg, jpeg, png, or gif image.',
+            'favicon.mimes' => 'The favicon must be a jpg, jpeg, png, or gif image.',
+            'logo.max' => 'The logo image size must not exceed 2MB.',
+            'favicon.max' => 'The favicon image size must not exceed 2MB.',
+            'logo_alt_text.max' => 'The logo alt text cannot exceed 255 characters.',
+            'favicon_alt_text.max' => 'The favicon alt text cannot exceed 255 characters.',
+            'logo_title.max' => 'The logo title cannot exceed 255 characters.',
+            'favicon_title.max' => 'The favicon title cannot exceed 255 characters.',
         ];
     }
 
