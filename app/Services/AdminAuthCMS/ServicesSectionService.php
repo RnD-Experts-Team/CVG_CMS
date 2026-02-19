@@ -56,7 +56,7 @@ class ServicesSectionService
         if ($request->hasFile('image')) {
 
             // Upload the new image using the UploadImage trait
-            $upload = $this->uploadImage($request, 'services', 'image');
+            $upload = $this->uploadImage($request, 'servicesSection', 'image');
 
             if (! $upload['success']) {
                 return [

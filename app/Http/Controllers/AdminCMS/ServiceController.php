@@ -24,7 +24,7 @@ class ServiceController extends Controller
 
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error fetching services', null, 500);
+            return Response::Error('Error fetching services', $th->getMessage(), 500);
         }
     }
 
@@ -35,7 +35,7 @@ class ServiceController extends Controller
 
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error creating service', null, 500);
+            return Response::Error('Error creating service', $th->getMessage(), 500);
         }
     }
 
@@ -50,7 +50,7 @@ class ServiceController extends Controller
 
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error updating service', null, 500);
+            return Response::Error('Error updating service', $th->getMessage(), 500);
         }
     }
 
@@ -65,7 +65,7 @@ class ServiceController extends Controller
 
             return Response::Success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error fetching service', null, 500);
+            return Response::Error('Error fetching service', $th->getMessage(), 500);
         }
     }
 
@@ -80,7 +80,7 @@ class ServiceController extends Controller
 
             return Response::Success(null, $data['message'], $data['code']);
         } catch (Throwable $th) {
-            return Response::Error('Error deleting service', null, 500);
+            return Response::Error('Error deleting service', $th->getMessage(), 500);
         }
     }
 }
