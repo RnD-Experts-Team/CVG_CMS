@@ -1,0 +1,835 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CVG_CMS",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "servers": [],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "login",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "logout",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/home": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "get home page",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "get categories",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "get projects",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/projects/category/technology": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "get projects by category",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/projects/project-one": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "get projects by slug",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/services": {
+      "get": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "services",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/contact-submissions": {
+      "post": {
+        "tags": [
+          "Public API"
+        ],
+        "summary": "contact-submissions",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "full_name": "ebaa",
+                  "email": "ebaa@example.com",
+                  "phone_number": "+1 564 456",
+                  "project_details": "sdfdsfsdf"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/site-metadata": {
+      "get": {
+        "tags": [
+          "site metadata"
+        ],
+        "summary": "get site metadata",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "site metadata"
+        ],
+        "summary": "update site metadata",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/footer": {
+      "get": {
+        "tags": [
+          "footer"
+        ],
+        "summary": "get footer",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "name": "Updated CMS Name",
+                  "description": "This is the updated description of My CMS.",
+                  "keywords": "updated, cms, website, laravel",
+                  "logo_media_id": 1,
+                  "favicon_media_id": 2
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "footer"
+        ],
+        "summary": "update footer",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "contact": {
+                    "phone": "+1 (234) 567-8901",
+                    "whatsapp": "+1 (987) 654-9870",
+                    "email": "newcontact@example.com",
+                    "address": "456 Elm St, Springfield, IL"
+                  },
+                  "social_links": [
+                    {
+                      "platform": "facebook",
+                      "url": "https://facebook.com/newpage",
+                      "sort_order": 1,
+                      "is_active": 1
+                    },
+                    {
+                      "platform": "twitter",
+                      "url": "https://facebook.com/newpage",
+                      "sort_order": 1,
+                      "is_active": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/hero": {
+      "get": {
+        "tags": [
+          "hero section"
+        ],
+        "summary": "get hero section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "hero section"
+        ],
+        "summary": "update hero section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/projects-section": {
+      "get": {
+        "tags": [
+          "project section"
+        ],
+        "summary": "get project section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "project section"
+        ],
+        "summary": "update project section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Updated Projects",
+                  "description": "Updated description of our projects section"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/projects": {
+      "post": {
+        "tags": [
+          "project"
+        ],
+        "summary": "create project",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "project"
+        ],
+        "summary": "get projects",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/projects/3": {
+      "put": {
+        "tags": [
+          "project"
+        ],
+        "summary": "update project",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "project"
+        ],
+        "summary": "delete project",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/projects/1": {
+      "get": {
+        "tags": [
+          "project"
+        ],
+        "summary": "get project by id",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/categories": {
+      "get": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "get all categories",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "create category",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/categories/1": {
+      "put": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "update category",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/categories/3": {
+      "get": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "get category by id",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "delete category",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/services-section": {
+      "get": {
+        "tags": [
+          "service section"
+        ],
+        "summary": "get service section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "service section"
+        ],
+        "summary": "update service section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/services": {
+      "get": {
+        "tags": [
+          "services"
+        ],
+        "summary": "get all services",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Our Services",
+                  "description": "We provide high quality solutions.",
+                  "image_media_id": 1,
+                  "button_text": "Explore Services"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "services"
+        ],
+        "summary": "create service",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/services/14": {
+      "put": {
+        "tags": [
+          "services"
+        ],
+        "summary": "update service",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/services/1": {
+      "get": {
+        "tags": [
+          "services"
+        ],
+        "summary": "get service by id",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "services"
+        ],
+        "summary": "delete service",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/values": {
+      "get": {
+        "tags": [
+          "values section"
+        ],
+        "summary": "get all values section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Backend Development",
+                  "description": "We build high performance Application.",
+                  "image_media_id": 1,
+                  "featured": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "values section"
+        ],
+        "summary": "update values section and items",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Our Core Values",
+                  "values": [
+                    {
+                      "title": "Innovation",
+                      "description": "We work with honesty.",
+                      "media_id": 1,
+                      "sort_order": 1
+                    },
+                    {
+                      "title": "Innovation",
+                      "description": "We embrace creativity.",
+                      "media_id": 2,
+                      "sort_order": 2
+                    },
+                    {
+                      "title": "Innovation",
+                      "description": "We embrace creativity.",
+                      "media_id": 2,
+                      "sort_order": 3
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/process": {
+      "get": {
+        "tags": [
+          "process section"
+        ],
+        "summary": "get process section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "process section"
+        ],
+        "summary": "update process section with steps",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/about": {
+      "get": {
+        "tags": [
+          "about section"
+        ],
+        "summary": "get about section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "about section"
+        ],
+        "summary": "update about section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/admin/contact-section": {
+      "get": {
+        "tags": [
+          "contact section"
+        ],
+        "summary": "get contact section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "About Our Company",
+                  "description": "We are a company that provides CMS solutions and services.",
+                  "image_media_id": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "contact section"
+        ],
+        "summary": "update contact section",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Contact Us",
+                  "subtitle": "We would love to hear from you"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/contact-submissions": {
+      "get": {
+        "tags": [
+          "contact-submissions"
+        ],
+        "summary": "get contact sumbitions",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Contact Us",
+                  "subtitle": "We would love to hear from you"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/contact-submissions/1": {
+      "get": {
+        "tags": [
+          "contact-submissions"
+        ],
+        "summary": "get contact submission by id",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "Contact Us",
+                  "subtitle": "We would love to hear from you"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {}
+  }
+}

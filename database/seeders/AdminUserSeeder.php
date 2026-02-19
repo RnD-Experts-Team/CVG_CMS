@@ -20,7 +20,6 @@ class AdminUserSeeder extends Seeder
                 'name' => 'Admin',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password'), // Ensure the password is hashed
-                'role' => 'Admin', // Set the role as 'Admin'
             ]);
 
             $this->command->info('Admin user created successfully!');
