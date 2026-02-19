@@ -21,15 +21,29 @@ class PublicCMSService
     public function getHomeData()
     {
         return [
-            'site_metadata' => SiteMetadata::first() ?? [
+            // Site Metadata with all media info (logo and favicon)
+            'site_metadata' => SiteMetadata::with(['logo', 'favicon'])->first() ?? [
                 'id' => null,
                 'name' => '',
                 'description' => '',
                 'keywords' => '',
-                'logo' => [],
-                'favicon' => [],
+                'logo' => [
+                    'id' => null,
+                    'path' => '',
+                    'url' => '',
+                    'alt_text' => '',
+                    'title' => '',
+                ],
+                'favicon' => [
+                    'id' => null,
+                    'path' => '',
+                    'url' => '',
+                    'alt_text' => '',
+                    'title' => '',
+                ],
             ],
 
+            // Footer with all contact and social link data
             'footer' => [
                 'contact' => FooterContact::first() ?? [
                     'phone' => '',
@@ -40,6 +54,7 @@ class PublicCMSService
                 'social_links' => FooterSocialLink::all() ?? [],
             ],
 
+            // Hero Section with media details
             'hero' => HeroSection::with('media')->first() ?? [
                 'title' => '',
                 'subtitle' => '',
@@ -47,9 +62,16 @@ class PublicCMSService
                     'text' => '',
                     'link' => '',
                 ],
-                'media' => [],
+                'media' => [
+                    'id' => null,
+                    'path' => '',
+                    'url' => '',
+                    'alt_text' => '',
+                    'title' => '',
+                ],
             ],
 
+            // Projects Section (map data for each project)
             'projects_section' => Project::with('category')->get()->map(function ($project) {
                 return [
                     'title' => $project->title,
@@ -59,30 +81,53 @@ class PublicCMSService
                 ];
             }),
 
+            // Services Section with image data (all media info)
             'services_section' => ServicesSection::with('image')->first() ?? [
                 'title' => '',
                 'description' => '',
-                'image' => [],
+                'image' => [
+                    'id' => null,
+                    'path' => '',
+                    'url' => '',
+                    'alt_text' => '',
+                    'title' => '',
+                ],
                 'button_text' => '',
             ],
 
+            // Values Section with all values included
             'values_section' => ValuesSection::with('values')->first() ?? [
                 'id' => null,
                 'title' => '',
                 'values' => [],
             ],
 
+            // Process Section with image data (all media info)
             'process_section' => ProcessSection::with('image')->first() ?? [
                 'title' => '',
-                'image' => [],
+                'image' => [
+                    'id' => null,
+                    'path' => '',
+                    'url' => '',
+                    'alt_text' => '',
+                    'title' => '',
+                ],
             ],
 
+            // About Section with image data (all media info)
             'about_section' => AboutSection::with('image')->first() ?? [
                 'title' => '',
                 'description' => '',
-                'image' => [],
+                'image' => [
+                    'id' => null,
+                    'path' => '',
+                    'url' => '',
+                    'alt_text' => '',
+                    'title' => '',
+                ],
             ],
 
+            // Contact Section data
             'contact_section' => ContactSection::first() ?? [
                 'title' => '',
                 'subtitle' => '',
