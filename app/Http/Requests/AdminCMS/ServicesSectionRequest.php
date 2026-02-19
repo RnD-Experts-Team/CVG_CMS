@@ -19,17 +19,26 @@ class ServicesSectionRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image_media_id' => 'nullable|exists:media,id',
-            'button_text' => 'nullable|string|max:100',
+            'button_text' => 'nullable|string|max:255',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif', // Validating the image file type
+            'alt_text' => 'nullable|string|max:255',
+            'image_title' => 'nullable|string|max:255',
         ];
     }
 
     public function messages()
     {
         return [
-            'title.required' => 'Title is required.',
-            'title.string' => 'Title must be a string.',
-            'image_media_id.exists' => 'Selected image is invalid.',
+            'title.required' => 'The title is required.',
+            'title.string' => 'The title must be a valid string.',
+            'description.string' => 'The description must be a valid string.',
+            'button_text.string' => 'The button text must be a valid string.',
+            'image.file' => 'The image must be a valid file.',
+            'image.mimes' => 'The image must be a JPG, JPEG, PNG, or GIF file.',
+            'alt_text.string' => 'The alt text must be a valid string.',
+            'alt_text.max' => 'The alt text must not exceed 255 characters.',
+            'image_title.string' => 'The image title must be a valid string.',
+            'image_title.max' => 'The image title must not exceed 255 characters.',
         ];
     }
 
