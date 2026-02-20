@@ -29,7 +29,7 @@ class SiteMetadataRequest extends FormRequest
             'description' => 'nullable|string',
             'keywords' => 'nullable|string',
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image validation for logo
-            'favicon' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image validation for favicon
+            'favicon' => 'nullable|file|mimes:jpg,jpeg,png,gif,ico|max:2048', // Image validation for favicon
             'logo_alt_text' => 'nullable|string|max:255',
             'logo_title' => 'nullable|string|max:255',
             'favicon_alt_text' => 'nullable|string|max:255',
@@ -44,7 +44,7 @@ class SiteMetadataRequest extends FormRequest
             'logo.file' => 'The logo must be a valid image file.',
             'favicon.file' => 'The favicon must be a valid image file.',
             'logo.mimes' => 'The logo must be a jpg, jpeg, png, or gif image.',
-            'favicon.mimes' => 'The favicon must be a jpg, jpeg, png, or gif image.',
+            'favicon.mimes' => 'The favicon must be a jpg, jpeg, png,ico or gif image.',
             'logo.max' => 'The logo image size must not exceed 2MB.',
             'favicon.max' => 'The favicon image size must not exceed 2MB.',
             'logo_alt_text.max' => 'The logo alt text cannot exceed 255 characters.',

@@ -94,7 +94,21 @@ class SiteMetadataService
         if ($request->hasFile('favicon')) {
 
             // Upload favicon image using the UploadImage trait
-            $upload = $this->uploadImage($request, 'site/favicon', 'favicon');
+            // $upload = $this->uploadImage($request, 'site/favicon', 'favicon');
+
+            $file = $request->file('favicon');
+            $image = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+            // Check if the file is not an .ico and convert it if necessary
+            if ($file->getClientOriginalExtension() != 'ico') {
+                // Change the extension to .ico
+                $newFilePath = $file->storeAs('site/favicon', $image.'.ico', 'public');
+            } else {
+                // If it's already .ico, proceed with saving as it is
+                $newFilePath = $file->storeAs('site/favicon', $image.'.ico', 'public');
+            }
+
+            $upload = ['success' => true, 'data' => $newFilePath];
 
             if (! $upload['success']) {
                 return [
