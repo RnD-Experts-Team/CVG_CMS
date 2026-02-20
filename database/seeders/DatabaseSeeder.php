@@ -16,6 +16,18 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
+            MediaSeeder::class,
+            SiteMetadataSeeder::class,
+            FooterContactSeeder::class,
+            FooterSocialLinkSeeder::class,
+            HeroSectionSeeder::class,
+            CategorySeeder::class,
+            ProjectSeeder::class,
+            ServiceSectionSeeder::class,
+            ValuesSectionSeeder::class,
+            ProcessSectionSeeder::class,
+            AboutSectionSeeder::class,
+            ContactSectionSeeder::class,
         ]);
     }
 }

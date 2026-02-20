@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hero_media', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hero_section_id')->constrained('hero_section')->onDelete('cascade');
+            $table->foreignId('hero_section_id')->constrained('hero_sections')->onDelete('cascade');
             $table->foreignId('media_id')->constrained('media')->onDelete('restrict');
             $table->integer('sort_order')->default(0);
             $table->timestamps();

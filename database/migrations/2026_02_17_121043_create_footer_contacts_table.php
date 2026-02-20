@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('footer_contact', function (Blueprint $table) {
+        Schema::create('footer_contacts', function (Blueprint $table) {
             $table->id();
             $table->string('phone', 50)->nullable();
             $table->string('whatsapp', 50)->nullable();

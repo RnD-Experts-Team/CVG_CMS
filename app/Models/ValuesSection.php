@@ -8,7 +8,7 @@ class ValuesSection extends Model
 {
     protected $fillable = ['title'];
 
-    public function valuesItems()
+    public function values()
     {
         return $this->hasMany(ValuesItem::class, 'values_section_id');
     }

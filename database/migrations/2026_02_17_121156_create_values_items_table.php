@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('values_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('values_section_id')->constrained('values_section')->onDelete('cascade');
+            $table->foreignId('values_section_id')->constrained('values_sections')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('media_id')->nullable()->constrained('media')->onDelete('set null');
