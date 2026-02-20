@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             ProcessSectionSeeder::class,
             AboutSectionSeeder::class,
             ContactSectionSeeder::class,
+            ProjectsSectionSeeder::class,
         ]);
     }
 }

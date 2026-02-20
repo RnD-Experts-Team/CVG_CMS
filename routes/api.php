@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\AdminCMS\AdminCMSController;
+use App\Http\Controllers\AdminCMS\CategoryController;
+use App\Http\Controllers\AdminCMS\ProjectController;
+use App\Http\Controllers\AdminCMS\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PublicCMS\PublicCMSController;
 use Illuminate\Http\Request;
@@ -26,4 +30,69 @@ Route::controller(PublicCMSController::class)->group(function () {
     Route::get('/projects/{slug}', 'getProjectBySlug');
     Route::get('/services', 'getServices');
     Route::post('/contact-submissions', 'submitContactForm');
+});
+
+Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+    // Site Metadata
+    Route::controller(AdminCMSController::class)->group(function () {
+        Route::get('/site-metadata', 'getSiteMetadata');
+        Route::put('/site-metadata', 'updateSiteMetadata');
+    });
+
+    // Footer
+    Route::get('/footer', [AdminCMSController::class, 'getFooter']);
+    Route::put('/footer', [AdminCMSController::class, 'updateFooter']);
+
+    // Hero Section
+    Route::get('/hero', [AdminCMSController::class, 'getHero']);
+    Route::put('/hero', [AdminCMSController::class, 'updateHero']);
+
+    // Projects Section
+    Route::get('/projects-section', [AdminCMSController::class, 'getProjectsSection']);
+    Route::put('/projects-section', [AdminCMSController::class, 'updateProjectsSection']);
+
+    // Projects CRUD
+    Route::get('/projects', [ProjectController::class, 'getProjects']);
+    Route::post('/projects', [ProjectController::class, 'createProject']);
+    Route::get('/projects/{id}', [ProjectController::class, 'getProjectById']);
+    Route::put('/projects/{id}', [ProjectController::class, 'updateProject']);
+    Route::delete('/projects/{id}', [ProjectController::class, 'deleteProject']);
+
+    // Categories CRUD
+    Route::get('/categories', [CategoryController::class, 'getAllCategories']);
+    Route::post('/categories', [CategoryController::class, 'createCategory']);
+    Route::put('/categories/{id}', [CategoryController::class, 'updateCategory']);
+    Route::get('/categories/{id}', [CategoryController::class, 'getCategoryById']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'deleteCategory']);
+
+    // Services Section
+    Route::get('/services-section', [AdminCMSController::class, 'getServicesSection']);
+    Route::put('/services-section', [AdminCMSController::class, 'updateServicesSection']);
+
+    // Services CRUD
+    Route::get('/services', [ServiceController::class, 'getAllServices']);
+    Route::post('/services', [ServiceController::class, 'createService']);
+    Route::put('/services/{id}', [ServiceController::class, 'updateService']);
+    Route::get('/services/{id}', [ServiceController::class, 'getServiceById']);
+    Route::delete('/services/{id}', [ServiceController::class, 'deleteService']);
+
+    // Values Section
+    Route::get('/values', [AdminCMSController::class, 'getValuesSection']);
+    Route::put('/values', [AdminCMSController::class, 'updateValuesSection']);
+
+    // Process Section
+    Route::get('/process', [AdminCMSController::class, 'getProcessSection']);
+    Route::put('/process', [AdminCMSController::class, 'updateProcessSection']);
+
+    // About Section
+    Route::get('/about', [AdminCMSController::class, 'getAboutSection']);
+    Route::put('/about', [AdminCMSController::class, 'updateAboutSection']);
+
+    // contact Section
+    Route::get('/contact-section', [AdminCMSController::class, 'getContactSection']);
+    Route::put('/contact-section', [AdminCMSController::class, 'updateContactSection']);
+
+    // contact Submissions
+    Route::get('/contact-submissions', [AdminCMSController::class, 'getAll']);
+    Route::get('/contact-submissions/{id}', [AdminCMSController::class, 'getById']);
 });
