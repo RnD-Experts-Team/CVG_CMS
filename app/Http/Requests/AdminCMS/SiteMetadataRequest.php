@@ -25,7 +25,7 @@ class SiteMetadataRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'keywords' => 'nullable|string',
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image validation for logo
