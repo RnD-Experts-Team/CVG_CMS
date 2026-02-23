@@ -61,7 +61,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     // Categories CRUD
     Route::get('/categories', [CategoryController::class, 'getAllCategories']);
     Route::post('/categories', [CategoryController::class, 'createCategory']);
-    Route::put('/categories/{id}', [CategoryController::class, 'updateCategory']);
+    Route::post('/categories/{id}', [CategoryController::class, 'updateCategory']);
     Route::get('/categories/{id}', [CategoryController::class, 'getCategoryById']);
     Route::delete('/categories/{id}', [CategoryController::class, 'deleteCategory']);
 

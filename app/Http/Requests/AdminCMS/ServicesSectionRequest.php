@@ -20,7 +20,7 @@ class ServicesSectionRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'button_text' => 'nullable|string|max:255',
-            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048', // Validating the image file type
+            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf', // Validating the image file type
             'alt_text' => 'nullable|string|max:255',
             'image_title' => 'nullable|string|max:255',
         ];

@@ -26,7 +26,7 @@ class ProjectRequest extends FormRequest
             'featured' => 'nullable|boolean',
             'category_id' => 'required|exists:categories,id',
             'images' => 'nullable|array',
-            'images.*.file' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048',
+            'images.*.file' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf',
             'images.*.alt_text' => 'nullable|string',
             'images.*.title' => 'nullable|string',
             'images.*.sort_order' => 'nullable|integer',

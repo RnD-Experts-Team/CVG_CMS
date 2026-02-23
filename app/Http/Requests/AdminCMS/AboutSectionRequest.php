@@ -21,7 +21,7 @@ class AboutSectionRequest extends FormRequest
             'description' => 'required|string',
 
             // ✅ upload file (optional)
-            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048',
+            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf',
 
             // ✅ update media meta (optional)
             'alt_text' => 'nullable|string|max:255',

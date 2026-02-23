@@ -429,7 +429,7 @@
       }
     },
     "/api/admin/categories/1": {
-      "put": {
+      "post": {
         "tags": [
           "categories"
         ],

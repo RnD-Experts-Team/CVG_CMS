@@ -74,16 +74,31 @@ class HeroService
 
                     // Get image full path and its dimensions
                     $fullPath = storage_path('app/public/'.$imagePath['data']);
-                    $size = getimagesize($fullPath);
+                    $mimeType = mime_content_type($fullPath);
+
+                    $width = null;
+                    $height = null;
+                    $type = 'image';
+
+                    if (str_starts_with($mimeType, 'image/')) {
+                        $size = getimagesize($fullPath);
+
+                        if ($size !== false) {
+                            $width = $size[0];
+                            $height = $size[1];
+                        }
+                    } elseif (str_starts_with($mimeType, 'video/')) {
+                        $type = 'video';
+                    }
 
                     // Create new media record in the database
                     $media = Media::create([
                         'path' => $imagePath['data'],
-                        'type' => 'image',
+                        'type' => $type,
                         'mime_type' => mime_content_type($fullPath),
                         'size_bytes' => filesize($fullPath),
-                        'width' => $size[0],
-                        'height' => $size[1],
+                        'width' => $width ?? 0,
+                        'height' => $height ?? 0,
                         'alt_text' => $mediaData['alt_text'] ?? 'Hero image',
                         'title' => $mediaData['title'] ?? 'Hero image title',
                     ]);

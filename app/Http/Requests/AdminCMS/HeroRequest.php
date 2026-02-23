@@ -25,7 +25,7 @@ class HeroRequest extends FormRequest
             'button_text' => 'required|string|max:100',
             'button_link' => 'required|url',
             'media' => 'nullable|array', // Media is optional
-            'media.*.file' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048',
+            'media.*.file' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf',
             'media.*.alt_text' => 'nullable|string|max:255',
             'media.*.title' => 'nullable|string|max:255',
             'media.*.sort_order' => 'nullable|integer|min:0', // Sort order validation
