@@ -171,7 +171,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "site metadata"
         ],
@@ -215,7 +215,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "footer"
         ],
@@ -274,7 +274,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "hero section"
         ],
@@ -302,7 +302,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "project section"
         ],
@@ -358,7 +358,7 @@
       }
     },
     "/api/admin/projects/3": {
-      "put": {
+      "post": {
         "tags": [
           "project"
         ],
@@ -485,7 +485,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "service section"
         ],
@@ -543,7 +543,7 @@
       }
     },
     "/api/admin/services/14": {
-      "put": {
+      "post": {
         "tags": [
           "services"
         ],
@@ -614,7 +614,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "values section"
         ],
@@ -674,7 +674,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "process section"
         ],
@@ -702,7 +702,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "about section"
         ],
@@ -744,7 +744,7 @@
           }
         }
       },
-      "put": {
+      "post": {
         "tags": [
           "contact section"
         ],

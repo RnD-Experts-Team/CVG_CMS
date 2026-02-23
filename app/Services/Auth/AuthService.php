@@ -26,9 +26,6 @@ class AuthService
         // If authentication is successful, get the user
         $user = $request->user();
 
-        // Delete any existing tokens for the user (to log out any other sessions)
-        $user->tokens()->delete();
-
         // Generate a new token for the user
         $token = $user->createToken('auth_token')->plainTextToken;
 

@@ -40,7 +40,7 @@ class SiteMetadataRequest extends FormRequest
     public function messages()
     {
         return [
-            'title.required' => 'The site title is required.',
+            'name.required' => 'The site name is required.',
             'logo.file' => 'The logo must be a valid image file.',
             'favicon.file' => 'The favicon must be a valid image file.',
             'logo.mimes' => 'The logo must be a jpg, jpeg, png, or gif image.',
