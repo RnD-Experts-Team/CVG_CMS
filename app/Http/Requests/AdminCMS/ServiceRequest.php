@@ -20,7 +20,7 @@ class ServiceRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'featured' => 'nullable|boolean',
-            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048', // Max size of 10MB, adjust as needed
+            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf', // Max size of 10MB, adjust as needed
             'alt_text' => 'nullable|string|max:255',
             'image_title' => 'nullable|string|max:255',
         ];

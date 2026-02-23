@@ -22,7 +22,7 @@ class ValuesSectionRequest extends FormRequest
             'values.*.title' => 'required|string|max:255',
             'values.*.description' => 'nullable|string',
             'values.*.media_id' => 'nullable|exists:media,id',  // Allow existing media ID
-            'values.*.image' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:10240', // Max size of 10MB
+            'values.*.image' => 'nullable|file|mimes:jpg,jpeg,png,gif', // Max size of 10MB
             'values.*.sort_order' => 'nullable|integer',
             'values.*.alt_text' => 'nullable|string|max:255',
         ];

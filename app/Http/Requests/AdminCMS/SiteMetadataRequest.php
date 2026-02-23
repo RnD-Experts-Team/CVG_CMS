@@ -28,8 +28,8 @@ class SiteMetadataRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'keywords' => 'nullable|string',
-            'logo' => 'nullable|file|mimes:jpg,jpeg,png,gif|max:2048', // Image validation for logo
-            'favicon' => 'nullable|file|mimes:jpg,jpeg,png,gif,ico|max:2048', // Image validation for favicon
+            'logo' => 'nullable|file|mimes:jpg,jpeg,png,gif', // Image validation for logo
+            'favicon' => 'nullable|file|mimes:jpg,jpeg,png,gif,ico', // Image validation for favicon
             'logo_alt_text' => 'nullable|string|max:255',
             'logo_title' => 'nullable|string|max:255',
             'favicon_alt_text' => 'nullable|string|max:255',

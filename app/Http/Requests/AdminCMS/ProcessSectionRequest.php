@@ -21,7 +21,7 @@ class ProcessSectionRequest extends FormRequest
             // 🔹 Switch Existing Media (optional)
             'image_media_id' => 'nullable|exists:media,id',
 
-            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf|max:2048',
+            'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf',
 
             // 🔹 Media Meta
             'alt_text' => 'nullable|string|max:255',
