@@ -118,6 +118,7 @@ class ServicesSectionService
         $section->update([
             'title' => $request->title,
             'description' => $request->description,
+            'content' => $request->content,
             'button_text' => $request->button_text,
         ]);
 

@@ -19,6 +19,7 @@ class ServiceRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'content' => 'nullable|string',
             'featured' => 'nullable|boolean',
             'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf', // Max size of 10MB, adjust as needed
             'alt_text' => 'nullable|string|max:255',
@@ -33,6 +34,7 @@ class ServiceRequest extends FormRequest
             'title.string' => 'The title must be a string.',
             'title.max' => 'The title may not be greater than 255 characters.',
             'description.string' => 'The description must be a string.',
+            'content.string' => 'The content must be a string.',
             'featured.boolean' => 'The featured field must be a boolean.',
             'image.file' => 'The image must be a valid file.',
             'image.mimes' => 'The image must be a file of type: jpg, jpeg, png, webp, mp4, avi, mov, mpg, webm or pdf.',
