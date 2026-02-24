@@ -17,6 +17,7 @@ return new class extends Migration
                 ->constrained('media')->nullOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->text('content')->nullable();
             $table->boolean('featured')->default(false);
             $table->string('slug')->unique();
             $table->timestamps();

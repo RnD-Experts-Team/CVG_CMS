@@ -506,6 +506,7 @@
         ],
         "summary": "get all services",
         "description": "",
+        "content": "",
         "parameters": [],
         "responses": {
           "200": {
@@ -520,6 +521,7 @@
                 "example": {
                   "title": "Our Services",
                   "description": "We provide high quality solutions.",
+                  "content": "We provide high quality solutions.",
                   "image_media_id": 1,
                   "button_text": "Explore Services"
                 }
@@ -534,6 +536,7 @@
         ],
         "summary": "create service",
         "description": "",
+        "content": "",
         "parameters": [],
         "responses": {
           "200": {
@@ -549,6 +552,7 @@
         ],
         "summary": "update service",
         "description": "",
+        "content": "",
         "parameters": [],
         "responses": {
           "200": {
@@ -564,6 +568,7 @@
         ],
         "summary": "get service by id",
         "description": "",
+        "content": "",
         "parameters": [],
         "responses": {
           "200": {
@@ -577,6 +582,7 @@
         ],
         "summary": "delete service",
         "description": "",
+        "content": "",
         "parameters": [],
         "responses": {
           "200": {

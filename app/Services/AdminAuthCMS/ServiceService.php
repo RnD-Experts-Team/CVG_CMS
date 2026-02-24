@@ -46,6 +46,7 @@ class ServiceService
         $service = Service::create([
             'title' => $request->title,
             'description' => $request->description,
+            'content' => $request->content,
             'featured' => $request->featured ?? 0,
         ]);
 
@@ -177,6 +178,7 @@ class ServiceService
         $service->update([
             'title' => $request->title,
             'description' => $request->description,
+            'content' => $request->content,
             'featured' => $request->featured ?? 0,
         ]);
 

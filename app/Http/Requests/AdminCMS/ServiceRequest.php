@@ -17,8 +17,9 @@ class ServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:services,title',
             'description' => 'nullable|string',
+            'content' => 'nullable|string',
             'featured' => 'nullable|boolean',
             'image' => 'nullable|mimes:jpg,jpeg,png,webp,mp4,avi,mov,mpg,webm,pdf', // Max size of 10MB, adjust as needed
             'alt_text' => 'nullable|string|max:255',
@@ -32,7 +33,9 @@ class ServiceRequest extends FormRequest
             'title.required' => 'The title is required.',
             'title.string' => 'The title must be a string.',
             'title.max' => 'The title may not be greater than 255 characters.',
+            'title.unique' => 'The title has already been taken. Please choose a different title for the slug be unique.',
             'description.string' => 'The description must be a string.',
+            'content.string' => 'The content must be a string.',
             'featured.boolean' => 'The featured field must be a boolean.',
             'image.file' => 'The image must be a valid file.',
             'image.mimes' => 'The image must be a file of type: jpg, jpeg, png, webp, mp4, avi, mov, mpg, webm or pdf.',
