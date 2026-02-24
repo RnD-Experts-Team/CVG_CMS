@@ -491,6 +491,7 @@
         ],
         "summary": "update service section",
         "description": "",
+        "content": "",
         "parameters": [],
         "responses": {
           "200": {

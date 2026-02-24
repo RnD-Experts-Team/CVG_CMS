@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
+            $table->text('content')->nullable();
             $table->foreignId('image_media_id')->nullable()->constrained('media')->onDelete('set null');
             $table->string('button_text')->nullable();
             $table->timestamps();
