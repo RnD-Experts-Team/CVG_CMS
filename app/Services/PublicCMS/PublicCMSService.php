@@ -55,20 +55,22 @@ class PublicCMSService
             ],
 
             // Hero Section with media details
-            'hero' => HeroSection::with('media')->first() ?? [
+            'hero' => HeroSection::with('media.media')->first() ?? [
                 'title' => '',
                 'subtitle' => '',
                 'button' => [
                     'text' => '',
                     'link' => '',
                 ],
-                'media' => [
-                    'id' => null,
-                    'path' => '',
-                    'url' => '',
-                    'alt_text' => '',
-                    'title' => '',
-                ],
+                'media' => HeroSection::first()->media->map(function ($media) {
+                    return [
+                        'id' => $media->id,
+                        'path' => $media->path,
+                        'url' => url('storage/'.$media->path),
+                        'alt_text' => $media->alt_text,
+                        'title' => $media->title,
+                    ];
+                }),
             ],
 
             // Projects Section (map data for each project)
