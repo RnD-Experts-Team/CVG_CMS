@@ -11,6 +11,7 @@ use App\Models\FooterSocialLink;
 use App\Models\HeroSection;
 use App\Models\ProcessSection;
 use App\Models\Project;
+use App\Models\ProjectsSection;
 use App\Models\Service;
 use App\Models\ServicesSection;
 use App\Models\SiteMetadata;
@@ -74,27 +75,15 @@ class PublicCMSService
             ],
 
             // Projects Section (map data for each project)
-            'projects_section' => Project::with('category')->get()->map(function ($project) {
-                return [
-                    'title' => $project->title,
-                    'description' => $project->description,
-                    'category' => $project->category,
-                    'featured' => $project->featured,
-                ];
-            }),
+            'projects_section' => [
+                'projects_section' => ProjectsSection::first(),
+                'projects' => Project::with('category', 'images')->get(),
+            ],
 
             // Services Section with image data (all media info)
-            'services_section' => ServicesSection::with('image')->first() ?? [
-                'title' => '',
-                'description' => '',
-                'image' => [
-                    'id' => null,
-                    'path' => '',
-                    'url' => '',
-                    'alt_text' => '',
-                    'title' => '',
-                ],
-                'button_text' => '',
+            'services_section' => [
+                'services_section' => ServicesSection::with('image')->first(),
+                'services' => Service::with('image')->get(),
             ],
 
             // Values Section with all values included
@@ -105,7 +94,7 @@ class PublicCMSService
             ],
 
             // Process Section with image data (all media info)
-            'process_section' => ProcessSection::with('image')->first() ?? [
+            'process_section' => ProcessSection::with('image', 'steps')->first() ?? [
                 'title' => '',
                 'image' => [
                     'id' => null,
