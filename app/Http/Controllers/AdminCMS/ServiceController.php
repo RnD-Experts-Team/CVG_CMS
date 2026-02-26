@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AdminCMS;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCMS\ServiceRequest;
+use App\Http\Requests\AdminCMS\UpdateServiceRequest;
 use App\Http\Responses\Response;
 use App\Services\AdminAuthCMS\ServiceService;
 use Throwable;
@@ -39,7 +40,7 @@ class ServiceController extends Controller
         }
     }
 
-    public function updateService(ServiceRequest $request, $id)
+    public function updateService(UpdateServiceRequest $request, $id)
     {
         try {
             $data = $this->serviceService->updateService($request, $id);
