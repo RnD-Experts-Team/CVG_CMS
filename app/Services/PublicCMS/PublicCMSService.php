@@ -77,7 +77,7 @@ class PublicCMSService
             // Projects Section (map data for each project)
             'projects_section' => [
                 'projects_section' => ProjectsSection::first(),
-                'projects' => Project::with('category', 'images')->get(),
+                'projects' => Project::with('category', 'images.media')->get(),
             ],
 
             // Services Section with image data (all media info)
