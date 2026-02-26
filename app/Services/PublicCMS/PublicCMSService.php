@@ -190,15 +190,21 @@ class PublicCMSService
     // Method to get paginated services
     public function getServices()
     {
-        $section = ServicesSection::first() ?? [
+        $section = ServicesSection::with('image')->first() ?? [
             'title' => '',
             'description' => '',
-            'image' => [],
+            'image' => [
+                'id' => null,
+                'path' => '',
+                'url' => '',
+                'alt_text' => '',
+                'title' => '',
+            ],
             'button_text' => '',
         ];
 
         // Get the paginated list of services
-        $services = Service::paginate(5);
+        $services = Service::with('image')->paginate(5);
 
         // Return the response with the required structure
         return [
