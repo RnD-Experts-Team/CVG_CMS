@@ -157,20 +157,22 @@ class ProjectService
         | REMOVE ALL OLD IMAGES
         |--------------------------------------------------------------------------
         */
-        foreach ($project->images as $oldImage) {
+        if ($request->has('images')) {
+            foreach ($project->images as $oldImage) {
 
-            // Optional: delete physical file
-            $filePath = storage_path('app/public/'.$oldImage->media->path);
-            if (file_exists($filePath)) {
-                unlink($filePath);
+                // Optional: delete physical file
+                $filePath = storage_path('app/public/'.$oldImage->media->path);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+
+                // Delete project image relation
+                $oldImage->delete();
+
+                // Delete media record
+                $oldImage->media->delete();
+
             }
-
-            // Delete project image relation
-            $oldImage->delete();
-
-            // Delete media record
-            $oldImage->media->delete();
-
         }
 
         /*
