@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthService
@@ -55,6 +56,34 @@ class AuthService
         return [
             'data' => null,
             'message' => 'Logged out successfully',
+            'code' => 200,
+        ];
+    }
+
+    public function update($request)
+    {
+        $user = auth()->user(); // or User::find($id);
+
+        // Update email if provided
+        if ($request->filled('email')) {
+            $user->email = $request->email;
+        }
+
+        // Update name if provided
+        if ($request->filled('name')) {
+            $user->name = $request->name;
+        }
+
+        // Update password only if provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return [
+            'data' => null,
+            'message' => 'data updated successfully',
             'code' => 200,
         ];
     }
