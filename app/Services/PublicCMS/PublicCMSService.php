@@ -87,7 +87,7 @@ class PublicCMSService
             ],
 
             // Values Section with all values included
-            'values_section' => ValuesSection::with('values')->first() ?? [
+            'values_section' => ValuesSection::with('values.media')->first() ?? [
                 'id' => null,
                 'title' => '',
                 'values' => [],
