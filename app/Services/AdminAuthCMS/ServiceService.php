@@ -177,8 +177,8 @@ class ServiceService
         // Update the service's main data
         $service->update([
             'title' => $request->title ?? $service->title,
-            'description' => $request->description,
-            'content' => $request->content,
+            'description' => $request->description ?? $service->description,
+            'content' => $request->content ?? $service->content,
             'featured' => $request->featured ?? 0,
         ]);
 
