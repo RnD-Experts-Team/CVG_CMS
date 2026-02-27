@@ -19,6 +19,7 @@ Route::prefix('auth')->group(function () {
 
     // Protected route for user logout (requires authentication via Sanctum)
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    Route::post('/updateUser', [AuthController::class, 'updateData'])->middleware('auth:sanctum');
 });
 
 // Public endpoints (no authentication required)
