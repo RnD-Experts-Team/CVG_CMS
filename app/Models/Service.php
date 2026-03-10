@@ -13,6 +13,8 @@ class Service extends Model
         'featured' => 'boolean',
     ];
 
+    protected $appends = ['url'];
+
     protected static function boot()
     {
         parent::boot();
@@ -20,6 +22,15 @@ class Service extends Model
         static::saving(function ($model) {
             $model->slug = Str::slug($model->title);
         });
+    }
+
+    public function getUrlAttribute(): ?string
+    {
+        if (! $this->icon_path) {
+            return null;
+        }
+
+        return asset('storage/'.$this->icon_path);
     }
 
     public function image()
