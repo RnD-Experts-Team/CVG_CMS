@@ -87,6 +87,9 @@ class ServiceService
             $service->image_media_id = $media->id;
             $service->save();
         }
+        $icon_path = $this->uploadImage($request, 'services/icon', 'icon');
+        $service->icon_path = $icon_path['data'];
+        $service->save();
 
         // Return the newly created service with associated image (if any)
         return [
@@ -173,6 +176,10 @@ class ServiceService
                 'title' => $request->image_title ?? $service->image->title,
             ]);
         }
+        if (Storage::disk('public')->exists($service->icon_path)) {
+            Storage::disk('public')->delete($service->icon_path);
+        }
+        $icon_path = $this->uploadImage($request, 'services/icon', 'icon');
 
         // Update the service's main data
         $service->update([
@@ -180,6 +187,7 @@ class ServiceService
             'description' => $request->description ?? $service->description,
             'content' => $request->content ?? $service->content,
             'featured' => $request->featured ?? 0,
+            'icon_path' => $icon_path['data'],
         ]);
 
         // Return the updated service with its image data
@@ -230,7 +238,9 @@ class ServiceService
                 'code' => 404,
             ];
         }
-
+        if (Storage::disk('public')->exists($service->icon_path)) {
+            Storage::disk('public')->delete($service->icon_path);
+        }
         $service->delete();
 
         return [
