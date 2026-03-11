@@ -30,6 +30,6 @@ docker exec cvg_cms_app php artisan optimize:clear
 docker exec cvg_cms_app php artisan optimize
 
 # Restart worker and scheduler
-docker compose restart cvg_cms_worker cvg_cms_scheduler
+docker compose restart cvg_cms_worker scheduler
 
 echo "✅ Deployment complete!"
