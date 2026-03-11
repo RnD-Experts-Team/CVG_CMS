@@ -100,7 +100,7 @@ Runs on every pull request to `main` and on every push to `main`.
 5. **Copy `.env`** — copies `.env.example` to `.env`
 6. **Generate app key** — `php artisan key:generate`
 7. **Laravel Pint** — `./vendor/bin/pint --test` (fails if code style violations found)
-8. **PHPUnit tests** — `php artisan test --parallel` with SQLite in-memory (configured in `phpunit.xml`)
+8. **PHPUnit tests** — `php artisan test` with SQLite in-memory (configured in `phpunit.xml`)
 
 ### Test environment (from `phpunit.xml`)
 
@@ -125,7 +125,9 @@ Runs only on push to `main`. Uses `concurrency: production-deploy` with `cancel-
 ### Steps
 
 1. **Checkout** — clone the repo on the GitHub Actions runner
-2. **Sync code to server** — uses `burnett01/rsync-deployments@7.0.1` to rsync source code to `/srv/apps/cvg_cms/` on the VPS
+2. **Setup SSH agent** — loads `SERVER_SSH_KEY` via `webfactory/ssh-agent@v0.9.0` into the runner's SSH agent
+3. **Add known hosts** — runs `ssh-keyscan` to trust the server host key
+4. **Sync code to server** — runs rsync directly (not via Docker container) to `/srv/apps/cvg_cms/` on the VPS
 
    **Excluded from rsync** (preserved on server):
    - `.git` — not needed on server
