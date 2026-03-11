@@ -18,6 +18,7 @@ class UpdateServiceRequest extends FormRequest
     {
         return [
             'title' => 'nullable|string|max:255|unique:services,title',
+            'icon' => 'nullable|mimes:jpg,jpeg,png,ico,cvg',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
             'featured' => 'nullable|boolean',

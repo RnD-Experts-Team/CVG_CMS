@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class Service extends Model
 {
-    protected $fillable = ['image_media_id', 'title', 'content', 'description', 'featured'];
+    protected $fillable = ['image_media_id', 'title', 'content', 'description', 'featured', 'icon_path'];
 
     protected $casts = [
         'featured' => 'boolean',
