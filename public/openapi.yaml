@@ -1,0 +1,2686 @@
+openapi: 3.0.0
+info:
+  title: Hiring Pizza API
+  version: 1.0.0
+  description: Comprehensive API for managing hiring requests, employees, and separation requests
+  contact:
+    name: Hiring Pizza Support
+  license:
+    name: MIT
+
+servers:
+  - url: '{{url}}'
+    description: Main API Server
+    variables:
+      url:
+        default: 'http://localhost:8000'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ==================== RESPONSE WRAPPERS ====================
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: Operation successful
+        data:
+          type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: An error occurred
+        data:
+          type: object
+          nullable: true
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 0
+        message:
+          type: object
+          description: Validation errors object with field names as keys
+        data:
+          type: object
+          nullable: true
+
+    PaginatedResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+        current_page:
+          type: integer
+          example: 1
+        last_page:
+          type: integer
+          example: 5
+        per_page:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 45
+        from:
+          type: integer
+          example: 1
+        to:
+          type: integer
+          example: 10
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                nullable: true
+              label:
+                type: string
+              active:
+                type: boolean
+
+    # ==================== AUTH SCHEMAS ====================
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: jane.smith@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              example: eyJ0eXAiOiJKV1QiLCJhbGc...
+
+    # ==================== HIRING REQUEST SCHEMAS ====================
+    CandidateInput:
+      type: object
+      required:
+        - name
+        - contact_number
+        - email
+      properties:
+        id:
+          type: integer
+          description: Required when updating, omit when creating
+        name:
+          type: string
+          maxLength: 40
+          example: John Doe
+        contact_number:
+          type: string
+          maxLength: 30
+          example: '09937119592'
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        notes:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: Good communication skills
+
+    CandidateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        contact_number:
+          type: string
+        email:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        approve_status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+
+    NewHireInput:
+      type: object
+      required:
+        - shift_id
+        - availability_needed
+      properties:
+        id:
+          type: integer
+          description: Required when updating, omit when creating
+        shift_id:
+          type: integer
+          example: 3
+          description: Shift ID (e.g., Morning 9 AM - 2 PM)
+        availability_needed:
+          type: string
+          enum:
+            - weekday
+            - weekends
+            - open_availability
+          example: weekday
+        notes:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: Good candidate for morning shift
+
+    NewHireResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        shift_id:
+          type: integer
+        availability_needed:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        approved_status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+        shift:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+
+    HiringRequestCreateRequest:
+      type: object
+      required:
+        - desired_start_date
+      properties:
+        desired_start_date:
+          type: string
+          format: date
+          example: '2026-05-01'
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateInput'
+        new_hires:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewHireInput'
+
+    HiringRequestUpdateRequest:
+      type: object
+      properties:
+        desired_start_date:
+          type: string
+          format: date
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateInput'
+        new_hires:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewHireInput'
+
+    HiringRequestResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        store_manager_id:
+          type: integer
+        store_id:
+          type: integer
+        date_of_request:
+          type: string
+          format: date-time
+        desired_start_date:
+          type: string
+          format: date
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateResponse'
+        newHires:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewHireResponse'
+        supervisorApprove:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            approve_status:
+              type: boolean
+            notes:
+              type: string
+            approvedBy:
+              type: object
+        hiringReview:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            is_completed:
+              type: boolean
+            notes:
+              type: string
+            date_of_request:
+              type: string
+              format: date-time
+            reviewedBy:
+              type: object
+
+    SupervisorDecisionRequest:
+      type: object
+      required:
+        - approve_status
+      properties:
+        approve_status:
+          type: boolean
+          example: true
+        notes:
+          type: string
+          maxLength: 255
+          nullable: true
+        candidates:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required:
+              - id
+              - status
+            properties:
+              id:
+                type: integer
+              status:
+                type: string
+                enum:
+                  - approved
+                  - rejected
+        new_hires:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required:
+              - id
+              - status
+            properties:
+              id:
+                type: integer
+              status:
+                type: string
+                enum:
+                  - approved
+                  - rejected
+
+    HiringReviewRequest:
+      type: object
+      required:
+        - is_completed
+      properties:
+        is_completed:
+          type: boolean
+          example: true
+        notes:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: Hiring review completed successfully
+
+    # ==================== EMPLOYEE SCHEMAS ====================
+    SalaryInfoInput:
+      type: object
+      properties:
+        salary_date:
+          type: string
+          format: date
+          nullable: true
+        base_pay:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+        performance_pay:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+
+    StatusHistoryInput:
+      type: object
+      properties:
+        status_type_id:
+          type: integer
+        status_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    AddressInput:
+      type: object
+      required:
+        - address_line_1
+        - city
+        - state
+        - country
+      properties:
+        address_line_1:
+          type: string
+          maxLength: 255
+          example: '123 Main Street'
+        address_line_2:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: 'Apt 4B'
+        city:
+          type: string
+          maxLength: 100
+          example: 'New York'
+        state:
+          type: string
+          maxLength: 100
+          example: 'NY'
+        zip_code:
+          type: string
+          maxLength: 20
+          nullable: true
+          example: '10001'
+        country:
+          type: string
+          maxLength: 100
+          example: 'USA'
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          nullable: true
+        is_primary:
+          type: boolean
+          nullable: true
+
+    AddressResponse:
+      allOf:
+        - $ref: '#/components/schemas/AddressInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    ContactInput:
+      type: object
+      required:
+        - contact_type
+        - contact_value
+      properties:
+        contact_type:
+          type: string
+          maxLength: 50
+          example: 'email'
+        contact_value:
+          type: string
+          maxLength: 255
+          example: 'john@example.com'
+        is_primary:
+          type: boolean
+          nullable: true
+
+    ContactResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContactInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    NoteInput:
+      type: object
+      required:
+        - notes
+      properties:
+        notes:
+          type: string
+          example: 'Employee note'
+
+    NoteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        notes:
+          type: string
+        created_by:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    FileInput:
+      type: object
+      required:
+        - type_id
+        - file
+      properties:
+        type_id:
+          type: integer
+        file:
+          type: string
+          format: binary
+        notes:
+          type: string
+          nullable: true
+
+    FileResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        type_id:
+          type: integer
+        file_path:
+          type: string
+        notes:
+          type: string
+          nullable: true
+
+    PaymentInfoInput:
+      type: object
+      required:
+        - account_type
+        - routing_number
+        - account_number
+      properties:
+        account_type:
+          type: string
+          enum:
+            - checking
+            - saving
+        routing_number:
+          type: string
+          maxLength: 50
+        account_number:
+          type: string
+          maxLength: 50
+        is_primary:
+          type: boolean
+          nullable: true
+
+    PaymentInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaymentInfoInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    EmployeeIdTypeInput:
+      type: object
+      required:
+        - employee_id_type_id
+        - id_number
+      properties:
+        employee_id_type_id:
+          type: integer
+          example: 1
+          description: ID type reference (e.g., Paychecks ID, Altemitrix ID)
+        id_number:
+          type: string
+          maxLength: 255
+          example: 'EMP123456'
+        is_primary:
+          type: boolean
+          nullable: true
+          example: true
+
+    EmployeeIdTypeResponse:
+      allOf:
+        - $ref: '#/components/schemas/EmployeeIdTypeInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+            employeeIdType:
+              type: object
+              properties:
+                id:
+                  type: integer
+                type_name:
+                  type: string
+
+    EmployeeCertificationInput:
+      type: object
+      required:
+        - certification_name
+      properties:
+        certification_name:
+          type: string
+          maxLength: 255
+          example: 'OSHA Certification'
+
+    EmployeeCertificationResponse:
+      allOf:
+        - $ref: '#/components/schemas/EmployeeCertificationInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    EmployeeCreateRequest:
+      type: object
+      required:
+        - position_id
+        - marital_status_id
+        - employement_type
+        - emp_status_id
+        - SSN_number
+        - first_name
+        - last_name
+      properties:
+        position_id:
+          type: integer
+          example: 2
+        marital_status_id:
+          type: integer
+          example: 1
+          description: Marital status ID reference
+        employement_type:
+          type: string
+          enum:
+            - '1099'
+            - W2
+          example: W2
+          description: Employment type
+        T_shirt_size:
+          type: string
+          enum:
+            - XS
+            - S
+            - M
+            - L
+            - XL
+            - XXL
+          nullable: true
+          example: M
+        emp_status_id:
+          type: integer
+          example: 3
+        SSN_number:
+          type: string
+          maxLength: 9
+          minLength: 9
+          example: '123456789'
+          description: Social Security Number (encrypted in database)
+        first_name:
+          type: string
+          maxLength: 30
+          example: 'John'
+        middle_name:
+          type: string
+          maxLength: 30
+          nullable: true
+          example: 'A'
+        last_name:
+          type: string
+          maxLength: 30
+          example: 'Doe'
+        gender:
+          type: string
+          maxLength: 20
+          nullable: true
+          enum:
+            - male
+            - female
+            - other
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+          example: '1990-05-15'
+        ids_info:
+          type: array
+          nullable: true
+          description: Employee ID information (e.g., Paychecks ID, Altemitrix ID)
+          items:
+            $ref: '#/components/schemas/EmployeeIdTypeInput'
+        certifications_info:
+          type: array
+          nullable: true
+          description: Employee certifications
+          items:
+            $ref: '#/components/schemas/EmployeeCertificationInput'
+        salary_info:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/SalaryInfoInput'
+        addresses:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/AddressInput'
+        contacts:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ContactInput'
+        notes:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/NoteInput'
+        files:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/FileInput'
+        payment_info:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/PaymentInfoInput'
+        availability:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/AvailabilityInput'
+        status_history:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/StatusHistoryInput'
+
+    EmployeeUpdateRequest:
+      type: object
+      properties:
+        position_id:
+          type: integer
+        marital_status_id:
+          type: integer
+        employement_type:
+          type: string
+          enum:
+            - '1099'
+            - W2
+        T_shirt_size:
+          type: string
+          enum:
+            - XS
+            - S
+            - M
+            - L
+            - XL
+            - XXL
+        emp_status_id:
+          type: integer
+        SSN_number:
+          type: string
+          maxLength: 9
+          minLength: 9
+        first_name:
+          type: string
+          maxLength: 30
+        middle_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+            - other
+        birth_date:
+          type: string
+          format: date
+        ids_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeIdTypeInput'
+        certifications_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeCertificationInput'
+        salary_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalaryInfoInput'
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressInput'
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactInput'
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoteInput'
+        files:
+          type: object
+          nullable: true
+          description: File management object with kept, deleted, and updated files
+          properties:
+            keptImage:
+              type: array
+              nullable: true
+              items:
+                type: integer
+              example: [1, 2]
+              description: IDs of files to keep
+            deletedImage:
+              type: array
+              nullable: true
+              items:
+                type: integer
+              example: [3, 4]
+              description: IDs of files to delete
+            updatedImage:
+              type: array
+              nullable: true
+              items:
+                type: object
+                required:
+                  - type_id
+                  - file
+                properties:
+                  type_id:
+                    type: integer
+                    example: 1
+                  notes:
+                    type: string
+                    nullable: true
+                    maxLength: 255
+                    example: Employee contract
+                  file:
+                    type: string
+                    format: binary
+        payment_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentInfoInput'
+        availability:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailabilityInput'
+
+    AvailabilityInput:
+      type: object
+      required:
+        - shift_id
+      properties:
+        shift_id:
+          type: integer
+        notes:
+          type: string
+          nullable: true
+        days:
+          type: array
+          nullable: true
+          items:
+            type: string
+            enum:
+              - sunday
+              - monday
+              - tuesday
+              - wednesday
+              - thursday
+              - friday
+              - saturday
+
+    AvailabilityResponse:
+      allOf:
+        - $ref: '#/components/schemas/AvailabilityInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    EmployeeProfileResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        employee_id:
+          type: integer
+        first_name:
+          type: string
+        middle_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+        gender:
+          type: string
+        birth_date:
+          type: string
+          format: date
+
+    EmployeeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        store_id:
+          type: integer
+        position_id:
+          type: integer
+        marital_status_id:
+          type: integer
+        employement_type:
+          type: string
+        T_shirt_size:
+          type: string
+          nullable: true
+        emp_status_id:
+          type: integer
+        SSN_number:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        employeeProfile:
+          $ref: '#/components/schemas/EmployeeProfileResponse'
+        employeeAddresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressResponse'
+        employeeContacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+        employeeNotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoteResponse'
+        employeeFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileResponse'
+        employeePaymentInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentInfoResponse'
+        employeeSalaryInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalaryInfoInput'
+        employeeStatusHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusHistoryInput'
+        employeeAvailability:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailabilityResponse'
+        employeeIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeIdTypeResponse'
+        createdCertificationsInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeCertificationResponse'
+
+    CreateEmployeePageResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            separationReasons:
+              type: array
+              items:
+                type: object
+            positions:
+              type: array
+              items:
+                type: object
+            stores:
+              type: array
+              items:
+                type: object
+            employeeStatuses:
+              type: array
+              items:
+                type: object
+            employeeFileTypes:
+              type: array
+              items:
+                type: object
+            shifts:
+              type: array
+              items:
+                type: object
+            employeeMaritalStatuses:
+              type: array
+              items:
+                type: object
+            employeeIdTypes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  type_name:
+                    type: string
+
+    # ==================== SEPARATION REQUEST SCHEMAS ====================
+    SeparationAttachmentInput:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+        note:
+          type: string
+          maxLength: 255
+          nullable: true
+
+    SeparationAttachmentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        separation_id:
+          type: integer
+        reason_id:
+          type: integer
+          nullable: true
+        attatchment_path:
+          type: string
+        attatchment_note:
+          type: string
+          nullable: true
+
+    SeparationRequestCreateRequest:
+      type: object
+      required:
+        - separation_type
+        - reason_type
+        - final_work_date
+      properties:
+        separation_type:
+          type: string
+          enum:
+            - termination
+            - resignation
+          example: termination
+        reason_type:
+          type: string
+          enum:
+            - other
+            - resignation
+            - termination
+          example: other
+        reason_title:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: 'Policy violation'
+        reason_id:
+          type: integer
+          nullable: true
+          description: Required unless reason_type is 'other'
+        final_work_date:
+          type: string
+          format: date
+          example: '2026-04-05'
+        other_notes:
+          type: string
+          maxLength: 255
+          nullable: true
+        attachments:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/SeparationAttachmentInput'
+        termination_letter:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: Required if separation_type is 'termination'
+          example: 'Termination approved by management'
+
+    SeparationRequestUpdateRequest:
+      type: object
+      properties:
+        separation_type:
+          type: string
+          enum:
+            - termination
+            - resignation
+        reason_type:
+          type: string
+          enum:
+            - other
+            - resignation
+            - termination
+        reason_title:
+          type: string
+          maxLength: 255
+        reason_id:
+          type: integer
+        final_work_date:
+          type: string
+          format: date
+        other_notes:
+          type: string
+          maxLength: 255
+        attachments:
+          type: object
+          nullable: true
+          description: Attachment management object with kept, deleted, and updated attachments
+          properties:
+            keptAttachment:
+              type: array
+              nullable: true
+              items:
+                type: integer
+              example: [1, 2]
+              description: IDs of attachments to keep
+            deletedAttachment:
+              type: array
+              nullable: true
+              items:
+                type: integer
+              example: [3]
+              description: IDs of attachments to delete
+            updatedAttachment:
+              type: array
+              nullable: true
+              items:
+                type: object
+                required:
+                  - file
+                properties:
+                  note:
+                    type: string
+                    nullable: true
+                    maxLength: 255
+                    example: Separation document
+                  file:
+                    type: string
+                    format: binary
+        termination_letter:
+          type: string
+          maxLength: 255
+
+    SeparationReasonResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        reason_type:
+          type: string
+        reason_title:
+          type: string
+
+    SeparationRequestResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        store_manager_id:
+          type: integer
+        store_id:
+          type: integer
+        employee_id:
+          type: integer
+        date_of_request:
+          type: string
+          format: date-time
+        separation_type:
+          type: string
+        final_work_date:
+          type: string
+          format: date
+        other_notes:
+          type: string
+          nullable: true
+        termination_letter:
+          type: string
+          nullable: true
+        employee:
+          $ref: '#/components/schemas/EmployeeResponse'
+        separationAttachments:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/SeparationAttachmentResponse'
+              - type: object
+                properties:
+                  reason:
+                    $ref: '#/components/schemas/SeparationReasonResponse'
+        supervisorApprove:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            accept_status:
+              type: boolean
+            notes:
+              type: string
+            approvedBy:
+              type: object
+        hiringReview:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            is_completed:
+              type: boolean
+            notes:
+              type: string
+            date_of_request:
+              type: string
+              format: date-time
+            reviewedBy:
+              type: object
+
+    SeparationDecisionRequest:
+      type: object
+      required:
+        - accept_status
+      properties:
+        accept_status:
+          type: boolean
+          example: true
+        notes:
+          type: string
+          maxLength: 255
+          nullable: true
+
+    SeparationReviewRequest:
+      type: object
+      required:
+        - is_completed
+      properties:
+        is_completed:
+          type: boolean
+          example: true
+        notes:
+          type: string
+          maxLength: 255
+          nullable: true
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==================== AUTH ENDPOINTS ====================
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Authenticate user with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: User logout
+      description: Logout authenticated user
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ==================== HIRING REQUEST ENDPOINTS ====================
+  /api/stores/{storeId}/hiring-requests:
+    post:
+      tags:
+        - Hiring Request
+      summary: Create hiring request
+      description: Create a new hiring request with candidates and positions
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HiringRequestCreateRequest'
+      responses:
+        '201':
+          description: Hiring request created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HiringRequestResponse'
+        '403':
+          description: Unauthorized to access this store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    get:
+      tags:
+        - Hiring Request
+      summary: Get all hiring requests
+      description: Retrieve all hiring requests for a store with pagination and filters
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by candidate name or email
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+          description: Number of results to return per page
+        - name: supervisor_status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+          description: Filter by supervisor decision
+        - name: has_review
+          in: query
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+          description: Filter by review status
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter from date
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter to date
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter by desired start date
+        - name: candidate_status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+          description: Filter by candidate status
+        - name: new_hire_status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+          description: Filter by new hire status
+        - name: shift_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by shift
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+          description: Sort field (default date_of_request)
+        - name: sort_direction
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        '200':
+          description: List of hiring requests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/HiringRequestResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/hiring-requests/{requestId}:
+    get:
+      tags:
+        - Hiring Request
+      summary: Get hiring request by ID
+      description: Retrieve a specific hiring request with full details
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Hiring request details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HiringRequestResponse'
+        '404':
+          description: Hiring request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Hiring Request
+      summary: Update hiring request
+      description: Update an existing hiring request
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HiringRequestUpdateRequest'
+      responses:
+        '200':
+          description: Hiring request updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HiringRequestResponse'
+        '404':
+          description: Hiring request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - Hiring Request
+      summary: Delete hiring request
+      description: Delete a hiring request
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Hiring request deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    nullable: true
+        '404':
+          description: Hiring request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/hiring-requests/{requestId}/supervisor-decision:
+    post:
+      tags:
+        - Hiring Request
+      summary: Supervisor decision on hiring request
+      description: Supervisor approves or rejects hiring request and individual candidates/positions
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupervisorDecisionRequest'
+      responses:
+        '200':
+          description: Decision recorded successfully (updated)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          supervisor_decision:
+                            type: object
+                          hiring_request:
+                            $ref: '#/components/schemas/HiringRequestResponse'
+        '201':
+          description: Decision recorded successfully (created)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          supervisor_decision:
+                            type: object
+                          hiring_request:
+                            $ref: '#/components/schemas/HiringRequestResponse'
+        '404':
+          description: Hiring request or related item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /api/stores/{storeId}/hiring-requests/{requestId}/hiring-review:
+    post:
+      tags:
+        - Hiring Request
+      summary: Hiring review
+      description: Complete hiring review for a request
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HiringReviewRequest'
+      responses:
+        '200':
+          description: Review completed/updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          hiring_review:
+                            type: object
+                          hiring_request:
+                            $ref: '#/components/schemas/HiringRequestResponse'
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          hiring_review:
+                            type: object
+                          hiring_request:
+                            $ref: '#/components/schemas/HiringRequestResponse'
+        '400':
+          description: Supervisor decision is required before hiring review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Hiring request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  # ==================== EMPLOYEE ENDPOINTS ====================
+  /api/stores/{storeId}/employees:
+    post:
+      tags:
+        - Employee
+      summary: Create employee
+      description: Create a new employee record with all related data (supports SSN encryption)
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmployeeCreateRequest'
+      responses:
+        '201':
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EmployeeResponse'
+        '403':
+          description: Unauthorized to access this store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    get:
+      tags:
+        - Employee
+      summary: Get all employees
+      description: Retrieve all employees for a store with pagination and filters
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name, email, or SSN
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+          description: Number of results to return per page
+        - name: position_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by position
+        - name: emp_status_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by employee status
+        - name: employment_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - '1099'
+              - W2
+          description: Filter by employment type
+        - name: paychecks_id
+          in: query
+          schema:
+            type: string
+          description: Filter by paychecks ID
+        - name: altemitrix_id
+          in: query
+          schema:
+            type: string
+          description: Filter by Altemitrix ID
+        - name: city
+          in: query
+          schema:
+            type: string
+          description: Filter by city
+      responses:
+        '200':
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          employees:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/EmployeeResponse'
+                          filtersKeys:
+                            type: object
+                            properties:
+                              separationReason:
+                                type: array
+                              position:
+                                type: array
+                              stores:
+                                type: array
+                              employeeStatus:
+                                type: array
+                              employeeFilesType:
+                                type: array
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/employees/{employeeId}:
+    get:
+      tags:
+        - Employee
+      summary: Get employee by ID
+      description: Retrieve a specific employee with full details (SSN will be decrypted)
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 6
+      responses:
+        '200':
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EmployeeResponse'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Employee
+      summary: Update employee
+      description: Update an existing employee record with support for partial file updates
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 8
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmployeeUpdateRequest'
+      responses:
+        '200':
+          description: Employee updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EmployeeResponse'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - Employee
+      summary: Delete employee
+      description: Delete an employee record and associated files
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 8
+      responses:
+        '200':
+          description: Employee deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    nullable: true
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/create-employee-page:
+    get:
+      tags:
+        - Employee
+      summary: Get employee creation page data
+      description: Retrieve dropdown data and settings for employee creation including marital statuses and ID types
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      responses:
+        '200':
+          description: Page data with dropdowns and form fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEmployeePageResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ==================== SEPARATION REQUEST ENDPOINTS ====================
+  /api/stores/{storeId}/separation-requests/employee/{employeeId}:
+    post:
+      tags:
+        - Separation Request
+      summary: Create separation request
+      description: Create a new employee separation request (requires employee ID)
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeparationRequestCreateRequest'
+      responses:
+        '201':
+          description: Separation request created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeparationRequestResponse'
+        '403':
+          description: Unauthorized or employee not in this store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Employee not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /api/stores/{storeId}/separation-requests:
+    get:
+      tags:
+        - Separation Request
+      summary: Get all separation requests
+      description: Retrieve all separation requests for a store with pagination and filters
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by employee name or notes
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+          description: Number of results to return per page
+        - name: supervisor_status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - accepted
+              - rejected
+          description: Filter by supervisor decision
+        - name: has_review
+          in: query
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+          description: Filter by review status
+        - name: review_completed
+          in: query
+          schema:
+            type: boolean
+          description: Filter by review completion
+        - name: separation_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - termination
+              - resignation
+              - retirement
+          description: Filter by separation type
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter from date
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter to date
+        - name: final_work_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter by final work date
+        - name: reason_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by reason
+        - name: employee_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by employee
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+          description: Sort field
+        - name: sort_direction
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        '200':
+          description: List of separation requests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SeparationRequestResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/separation-requests/{separationId}:
+    get:
+      tags:
+        - Separation Request
+      summary: Get separation request by ID
+      description: Retrieve a specific separation request with full details
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: separationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Separation request details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeparationRequestResponse'
+        '404':
+          description: Separation request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Separation Request
+      summary: Update separation request
+      description: Update an existing separation request with support for partial attachment updates
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: separationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SeparationRequestUpdateRequest'
+      responses:
+        '200':
+          description: Separation request updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeparationRequestResponse'
+        '404':
+          description: Separation request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+    delete:
+      tags:
+        - Separation Request
+      summary: Delete separation request
+      description: Delete a separation request and associated files
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: separationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        '200':
+          description: Separation request deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    nullable: true
+        '404':
+          description: Separation request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/separation-requests/{separationId}/supervisor-decision:
+    post:
+      tags:
+        - Separation Request
+      summary: Supervisor decision on separation request
+      description: Supervisor accepts or rejects separation request
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: separationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeparationDecisionRequest'
+      responses:
+        '200':
+          description: Decision recorded/updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          supervisor_decision:
+                            type: object
+                          separation_request:
+                            $ref: '#/components/schemas/SeparationRequestResponse'
+        '201':
+          description: Decision created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          supervisor_decision:
+                            type: object
+                          separation_request:
+                            $ref: '#/components/schemas/SeparationRequestResponse'
+        '404':
+          description: Separation request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /api/stores/{storeId}/separation-requests/{separationId}/hiring-review:
+    post:
+      tags:
+        - Separation Request
+      summary: Separation review
+      description: Complete review for a separation request. Updates employee status if completed and accepted.
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+        - name: separationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeparationReviewRequest'
+      responses:
+        '200':
+          description: Review completed/updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          hiring_review:
+                            type: object
+                          separation_request:
+                            $ref: '#/components/schemas/SeparationRequestResponse'
+                          employee:
+                            $ref: '#/components/schemas/EmployeeResponse'
+                          status_history:
+                            type: object
+                            nullable: true
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          hiring_review:
+                            type: object
+                          separation_request:
+                            $ref: '#/components/schemas/SeparationRequestResponse'
+                          employee:
+                            $ref: '#/components/schemas/EmployeeResponse'
+                          status_history:
+                            type: object
+                            nullable: true
+        '400':
+          description: Supervisor decision is required before review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Separation request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  # ==================== EXPORT ENDPOINTS ====================
+  /api/stores/{storeId}/exports/employees:
+    get:
+      tags:
+        - Export
+      summary: Export employees to Excel
+      description: Download employee data as Excel file
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      responses:
+        '200':
+          description: Excel file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/exports/separations:
+    get:
+      tags:
+        - Export
+      summary: Export separations to Excel
+      description: Download separation requests as Excel file
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      responses:
+        '200':
+          description: Excel file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/{storeId}/exports/hiring-requests:
+    get:
+      tags:
+        - Export
+      summary: Export hiring requests to Excel
+      description: Download hiring requests as Excel file
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      responses:
+        '200':
+          description: Excel file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ==================== IMPORT ENDPOINTS ====================
+  /api/stores/{storeId}/imports/employees:
+    post:
+      tags:
+        - Import
+      summary: Import employees from Excel
+      description: Upload employee data from CSV/Excel file for bulk import
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '03795-00001'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV or Excel file with employee data
+      responses:
+        '200':
+          description: Import successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          imported_count:
+                            type: integer
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error in file format or data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
