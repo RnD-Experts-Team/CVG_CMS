@@ -31,17 +31,78 @@ class ProjectService
     private function formatImages($images)
     {
         return $images->map(function ($image) {
+            $media = $image->media;
+
             return [
                 'id' => $image->id,
-                'path' => $image->media->path, // Assuming 'media' is a relation on ProjectImage
-                'url' => $image->media->url, // Full URL to the image
-                'alt_text' => $image->media->alt_text,
-                'title' => $image->media->title,
-                'width' => $image->media->width,
-                'height' => $image->media->height,
+                'path' => $media?->path,
+                'url' => $media?->url,
+                'type' => $media?->type, // 'image' | 'video' | 'file'
+                'mime_type' => $media?->mime_type,
+                'alt_text' => $media?->alt_text,
+                'title' => $media?->title,
+                'width' => $media?->width,
+                'height' => $media?->height,
                 'sort_order' => $image->sort_order,
             ];
         });
+    }
+
+    /**
+     * Decide media type bucket from a MIME string.
+     */
+    private function detectMediaType(?string $mime): string
+    {
+        if (! $mime) {
+            return 'file';
+        }
+        if (str_starts_with($mime, 'image/')) {
+            return 'image';
+        }
+        if (str_starts_with($mime, 'video/')) {
+            return 'video';
+        }
+
+        return 'file';
+    }
+
+    /**
+     * Persist a single uploaded gallery item (image or video) and return Media row.
+     * Returns the Media model on success, or [success=>false, message=>...] on failure.
+     */
+    private function storeGalleryUpload($request, string $requestKey, array $imageData)
+    {
+        $upload = $this->uploadImage($request, 'projects', $requestKey);
+        if (! $upload['success']) {
+            return $upload;
+        }
+
+        $relativePath = $upload['data'];
+        $fullPath = storage_path('app/public/'.$relativePath);
+
+        $mime = @mime_content_type($fullPath) ?: $request->file($requestKey)?->getMimeType();
+        $type = $this->detectMediaType($mime);
+
+        $width = null;
+        $height = null;
+        if ($type === 'image') {
+            $size = @getimagesize($fullPath);
+            if (is_array($size)) {
+                $width = $size[0] ?? null;
+                $height = $size[1] ?? null;
+            }
+        }
+
+        return Media::create([
+            'path' => $relativePath,
+            'type' => $type,
+            'mime_type' => $mime,
+            'size_bytes' => @filesize($fullPath) ?: null,
+            'width' => $width,
+            'height' => $height,
+            'alt_text' => $imageData['alt_text'] ?? null,
+            'title' => $imageData['title'] ?? null,
+        ]);
     }
 
     // =======================================================================
@@ -84,45 +145,27 @@ class ProjectService
             'category_id' => $request->category_id,
         ]);
 
-        // Handle Image Uploads and store in the media table
+        // Handle Image/Video Uploads and store in the media table
         if ($request->has('images')) {
             foreach ($request->images as $index => $imageData) {
-                if ($request->hasFile("images.$index.file")) {
-
-                    $imagePath = $this->uploadImage(
-                        $request,
-                        'projects',
-                        "images.$index.file"
-                    );
-
-                    if (! $imagePath['success']) {
-                        return $imagePath;
-                    }
-
-                    $fullPath = storage_path('app/public/'.$imagePath['data']);
-                    $size = getimagesize($fullPath);
-
-                    $media = Media::create([
-                        'path' => $imagePath['data'],
-                        'type' => 'image',
-                        'mime_type' => mime_content_type($fullPath),
-                        'size_bytes' => filesize($fullPath),
-                        'width' => $size[0],
-                        'height' => $size[1],
-                        'alt_text' => $imageData['alt_text'] ?? 'Project image',
-                        'title' => $imageData['title'] ?? 'Project image title',
-                    ]);
-
-                    ProjectImage::create([
-                        'project_id' => $project->id,
-                        'media_id' => $media->id,
-                        'sort_order' => $imageData['sort_order'] ?? 0,
-                    ]);
+                if (! $request->hasFile("images.$index.file")) {
+                    continue;
                 }
+                $result = $this->storeGalleryUpload($request, "images.$index.file", (array) $imageData);
+                if (is_array($result) && isset($result['success']) && ! $result['success']) {
+                    return $result;
+                }
+                ProjectImage::create([
+                    'project_id' => $project->id,
+                    'media_id' => $result->id,
+                    'sort_order' => isset($imageData['sort_order']) ? (int) $imageData['sort_order'] : 0,
+                ]);
             }
         }
 
-        return $this->formatProjectData($project);
+        return $this->formatProjectData(
+            $project->fresh(['category', 'images.media'])
+        );
     }
 
     // // Update Project by ID
@@ -154,68 +197,85 @@ class ProjectService
 
         /*
         |--------------------------------------------------------------------------
-        | REMOVE ALL OLD IMAGES
+        | REMOVE ONLY EXPLICITLY REQUESTED IMAGES
         |--------------------------------------------------------------------------
         */
-        if ($request->has('images')) {
-            foreach ($project->images as $oldImage) {
+        $removedIds = $request->input('removed_image_ids', []);
+        if (! empty($removedIds)) {
+            $imagesToRemove = ProjectImage::with('media')
+                ->where('project_id', $project->id)
+                ->whereIn('id', $removedIds)
+                ->get();
 
-                // Optional: delete physical file
-                $filePath = storage_path('app/public/'.$oldImage->media->path);
-                if (file_exists($filePath)) {
-                    unlink($filePath);
+            foreach ($imagesToRemove as $img) {
+                if ($img->media) {
+                    $filePath = storage_path('app/public/'.$img->media->path);
+                    if (file_exists($filePath)) {
+                        @unlink($filePath);
+                    }
                 }
-
-                // Delete project image relation
-                $oldImage->delete();
-
-                // Delete media record
-                $oldImage->media->delete();
-
+                $mediaId = $img->media_id;
+                $img->delete();
+                if ($mediaId) {
+                    Media::where('id', $mediaId)->delete();
+                }
             }
         }
 
         /*
         |--------------------------------------------------------------------------
-        | CREATE NEW IMAGES
+        | UPDATE METADATA / SORT ORDER OF KEPT IMAGES
+        |--------------------------------------------------------------------------
+        */
+        $existing = $request->input('existing_images', []);
+        if (! empty($existing)) {
+            foreach ($existing as $row) {
+                if (empty($row['id'])) {
+                    continue;
+                }
+                $img = ProjectImage::with('media')
+                    ->where('project_id', $project->id)
+                    ->where('id', $row['id'])
+                    ->first();
+                if (! $img) {
+                    continue;
+                }
+
+                if (array_key_exists('sort_order', $row)) {
+                    $img->sort_order = (int) $row['sort_order'];
+                    $img->save();
+                }
+
+                if ($img->media && (array_key_exists('alt_text', $row) || array_key_exists('title', $row))) {
+                    $img->media->fill(array_filter([
+                        'alt_text' => $row['alt_text'] ?? null,
+                        'title' => $row['title'] ?? null,
+                    ], fn ($v) => $v !== null))->save();
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADD NEW IMAGES
         |--------------------------------------------------------------------------
         */
         if ($request->has('images')) {
-
             foreach ($request->images as $index => $imageData) {
-
-                if ($request->hasFile("images.$index.file")) {
-
-                    $imagePath = $this->uploadImage(
-                        $request,
-                        'projects',
-                        "images.$index.file"
-                    );
-
-                    if (! $imagePath['success']) {
-                        return $imagePath;
-                    }
-
-                    $fullPath = storage_path('app/public/'.$imagePath['data']);
-                    $size = getimagesize($fullPath);
-
-                    $media = Media::create([
-                        'path' => $imagePath['data'],
-                        'type' => 'image',
-                        'mime_type' => mime_content_type($fullPath),
-                        'size_bytes' => filesize($fullPath),
-                        'width' => $size[0],
-                        'height' => $size[1],
-                        'alt_text' => $imageData['alt_text'] ?? 'Project image',
-                        'title' => $imageData['title'] ?? 'Project image',
-                    ]);
-
-                    ProjectImage::create([
-                        'project_id' => $project->id,
-                        'media_id' => $media->id,
-                        'sort_order' => $imageData['sort_order'] ?? 0,
-                    ]);
+                if (! $request->hasFile("images.$index.file")) {
+                    continue;
                 }
+
+                $media = $this->storeGalleryUpload($request, "images.$index.file", (array) $imageData);
+                if (is_array($media) && isset($media['success']) && ! $media['success']) {
+                    return $media;
+                }
+
+                ProjectImage::create([
+                    'project_id' => $project->id,
+                    'media_id' => $media->id,
+                    'sort_order' => isset($imageData['sort_order']) ? (int) $imageData['sort_order'] : 0,
+                ]);
             }
         }
 
@@ -258,15 +318,17 @@ class ProjectService
         |--------------------------------------------------------------------------
         */
         foreach ($project->images as $image) {
-
-            $filePath = storage_path('app/public/'.$image->media->path);
-
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            if ($image->media) {
+                $filePath = storage_path('app/public/'.$image->media->path);
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
             }
-
+            $mediaId = $image->media_id;
             $image->delete();
-            $image->media->delete();
+            if ($mediaId) {
+                Media::where('id', $mediaId)->delete();
+            }
         }
 
         /*
