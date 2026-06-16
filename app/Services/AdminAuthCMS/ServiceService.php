@@ -48,6 +48,7 @@ class ServiceService
             'description' => $request->description,
             'content' => $request->content,
             'featured' => $request->featured ?? 0,
+            'type' => $request->type ?? 'general',
         ]);
 
         // Check if an image is provided in the request
@@ -202,6 +203,7 @@ class ServiceService
             'description' => $request->description ?? $service->description,
             'content' => $request->content ?? $service->content,
             'featured' => $request->featured ?? 0,
+            'type' => $request->type ?? $service->type,
             'icon_path' => $iconPath,
         ]);
 

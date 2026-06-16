@@ -188,7 +188,7 @@ class PublicCMSService
     }
 
     // Method to get paginated services
-    public function getServices()
+    public function getServices($type = null)
     {
         $section = ServicesSection::with('image')->first() ?? [
             'title' => '',
@@ -203,8 +203,12 @@ class PublicCMSService
             'button_text' => '',
         ];
 
-        // Get the paginated list of services
-        $services = Service::with('image')->paginate(5);
+        // Get the paginated list of services, optionally filtered by type
+        $query = Service::with('image')->latest();
+        if ($type) {
+            $query->where('type', $type);
+        }
+        $services = $query->paginate(5);
 
         // Return the response with the required structure
         return [

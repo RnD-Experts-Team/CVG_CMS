@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PublicCMS\ContactFormRequest;
 use App\Http\Responses\Response;
 use App\Services\PublicCMS\PublicCMSService;
+use Illuminate\Http\Request;
 use Throwable;
 
 class PublicCMSController extends Controller
@@ -78,10 +79,10 @@ class PublicCMSController extends Controller
     }
 
     // Get paginated services
-    public function getServices()
+    public function getServices(Request $request)
     {
         try {
-            $data = $this->publicCMSService->getServices();
+            $data = $this->publicCMSService->getServices($request->get('type'));
 
             return Response::Success($data['data'], $data['message']);
         } catch (Throwable $th) {
