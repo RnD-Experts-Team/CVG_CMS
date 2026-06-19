@@ -90,6 +90,18 @@ class PublicCMSController extends Controller
         }
     }
 
+    // Get service category cards (General / Design)
+    public function getServiceCategories()
+    {
+        try {
+            $data = $this->publicCMSService->getServiceCategories();
+
+            return Response::Success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            return Response::Error('Error fetching service categories', $th->getMessage(), 500);
+        }
+    }
+
     // Submit the contact form
     public function submitContactForm(ContactFormRequest $request)
     {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminCMS\AdminCMSController;
 use App\Http\Controllers\AdminCMS\CategoryController;
 use App\Http\Controllers\AdminCMS\ProjectController;
+use App\Http\Controllers\AdminCMS\ServiceCategoryController;
 use App\Http\Controllers\AdminCMS\ServiceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PublicCMS\PublicCMSController;
@@ -30,6 +31,7 @@ Route::controller(PublicCMSController::class)->group(function () {
     Route::get('/projects/category/{slug}', 'getProjectsByCategory');
     Route::get('/projects/{slug}', 'getProjectBySlug');
     Route::get('/services', 'getServices');
+    Route::get('/service-categories', 'getServiceCategories');
     Route::post('/contact-submissions', 'submitContactForm');
 });
 
@@ -96,4 +98,9 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     // contact Submissions
     Route::get('/contact-submissions', [AdminCMSController::class, 'getAll']);
     Route::get('/contact-submissions/{id}', [AdminCMSController::class, 'getById']);
+
+    // Service Categories (General / Design card content)
+    Route::get('/service-categories', [ServiceCategoryController::class, 'getServiceCategories']);
+    Route::get('/service-categories/{id}', [ServiceCategoryController::class, 'getServiceCategoryById']);
+    Route::post('/service-categories/{id}', [ServiceCategoryController::class, 'updateServiceCategory']);
 });

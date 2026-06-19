@@ -13,6 +13,7 @@ use App\Models\ProcessSection;
 use App\Models\Project;
 use App\Models\ProjectsSection;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\ServicesSection;
 use App\Models\SiteMetadata;
 use App\Models\ValuesSection;
@@ -219,6 +220,17 @@ class PublicCMSService
             ],
             'message' => 'Services fetched successfully',
             'code' => 200,
+        ];
+    }
+
+    public function getServiceCategories()
+    {
+        $categories = ServiceCategory::orderByRaw("FIELD(`key`, 'general', 'design')")->get();
+
+        return [
+            'data'    => $categories,
+            'message' => 'Service categories retrieved successfully',
+            'code'    => 200,
         ];
     }
 

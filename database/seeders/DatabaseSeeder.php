@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             AboutSectionSeeder::class,
             ContactSectionSeeder::class,
             ProjectsSectionSeeder::class,
+            ServiceCategorySeeder::class,
         ]);
     }
 }
