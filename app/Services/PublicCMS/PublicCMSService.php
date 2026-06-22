@@ -209,7 +209,7 @@ class PublicCMSService
         if ($type) {
             $query->where('type', $type);
         }
-        $services = $query->paginate(5);
+        $services = $query->paginate(100);
 
         // Return the response with the required structure
         return [
