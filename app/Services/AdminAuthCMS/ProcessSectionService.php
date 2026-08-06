@@ -6,7 +6,6 @@ use App\Models\Media;
 use App\Models\ProcessSection;
 use App\Models\ProcessStep;
 use App\Traits\UploadImage;
-use Illuminate\Support\Facades\Storage;
 
 class ProcessSectionService
 {
@@ -72,45 +71,25 @@ class ProcessSectionService
 
             /*
             |--------------------------------------------------------------------------
-            | If Media Exists → Update Same Media ID
+            | Always Create a New Media Row
             |--------------------------------------------------------------------------
+            | image_media_id can be shared with another section (e.g. Services),
+            | so mutating the existing Media row in place would silently change
+            | that other section's image too. Always create a fresh row and just
+            | repoint this section's image_media_id at it.
             */
-            if ($section->image) {
+            $media = Media::create([
+                'path' => $newPath,
+                'type' => 'image',
+                'mime_type' => mime_content_type($filePath),
+                'size_bytes' => filesize($filePath),
+                'width' => $imageSize[0] ?? null,
+                'height' => $imageSize[1] ?? null,
+                'alt_text' => $request->alt_text ?? ($section->image->alt_text ?? 'About image'),
+                'title' => $request->image_title ?? ($section->image->title ?? 'About image'),
+            ]);
 
-                // delete old physical file
-                if (Storage::disk('public')->exists($section->image->path)) {
-                    Storage::disk('public')->delete($section->image->path);
-                }
-
-                $section->image->update([
-                    'path' => $newPath,
-                    'mime_type' => mime_content_type($filePath),
-                    'size_bytes' => filesize($filePath),
-                    'width' => $imageSize[0] ?? null,
-                    'height' => $imageSize[1] ?? null,
-                    'alt_text' => $request->alt_text ?? $section->image->alt_text,
-                    'title' => $request->image_title ?? $section->image->title,
-                ]);
-
-            } else {
-                /*
-                |--------------------------------------------------------------------------
-                | First Time Image
-                |--------------------------------------------------------------------------
-                */
-                $media = Media::create([
-                    'path' => $newPath,
-                    'type' => 'image',
-                    'mime_type' => mime_content_type($filePath),
-                    'size_bytes' => filesize($filePath),
-                    'width' => $imageSize[0] ?? null,
-                    'height' => $imageSize[1] ?? null,
-                    'alt_text' => $request->alt_text ?? 'About image',
-                    'title' => $request->image_title ?? 'About image',
-                ]);
-
-                $section->image_media_id = $media->id;
-            }
+            $section->image_media_id = $media->id;
         } elseif ($section->image) {
             /*
             |--------------------------------------------------------------------------

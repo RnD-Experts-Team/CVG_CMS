@@ -68,23 +68,32 @@ class ServiceService
             // Get the uploaded image path
             $newPath = $upload['data'];
 
-            // Get the image size (width, height)
+            // Get the file's real mime type, dimensions only apply to images
             $filePath = storage_path('app/public/'.$newPath);
-            $imageSize = getimagesize($filePath);
+            $mimeType = mime_content_type($filePath);
+            $mediaType = str_starts_with($mimeType, 'video/') ? 'video' : 'image';
 
-            // Create a new media record for the uploaded image
+            $width = null;
+            $height = null;
+            if ($mediaType === 'image') {
+                $imageSize = getimagesize($filePath);
+                $width = $imageSize[0] ?? null;
+                $height = $imageSize[1] ?? null;
+            }
+
+            // Create a new media record for the uploaded image/video
             $media = Media::create([
                 'path' => $newPath,
-                'type' => 'image',
-                'mime_type' => mime_content_type($filePath),
+                'type' => $mediaType,
+                'mime_type' => $mimeType,
                 'size_bytes' => filesize($filePath),
-                'width' => $imageSize[0] ?? null,
-                'height' => $imageSize[1] ?? null,
+                'width' => $width,
+                'height' => $height,
                 'alt_text' => $request->alt_text ?? 'Service image',  // Default alt text
                 'title' => $request->image_title ?? 'Service image',  // Default image title
             ]);
 
-            // Associate the media (image) with the service
+            // Associate the media (image/video) with the service
             $service->image_media_id = $media->id;
             $service->save();
         }
@@ -133,43 +142,40 @@ class ServiceService
             // Path of the uploaded image
             $newPath = $upload['data'];
 
-            // Get the file size and image dimensions
+            // Get the file's real mime type; dimensions only apply to images
             $filePath = storage_path('app/public/'.$newPath);
-            $imageSize = getimagesize($filePath);
+            $mimeType = mime_content_type($filePath);
+            $mediaType = str_starts_with($mimeType, 'video/') ? 'video' : 'image';
 
-            // Check if the service already has an image
-            if ($service->image) {
-                // Delete the old physical image file from storage
-                if (Storage::disk('public')->exists($service->image->path)) {
-                    Storage::disk('public')->delete($service->image->path);
-                }
-
-                // Update the media record with the new image details
-                $service->image->update([
-                    'path' => $newPath,
-                    'mime_type' => mime_content_type($filePath),
-                    'size_bytes' => filesize($filePath),
-                    'width' => $imageSize[0] ?? null,
-                    'height' => $imageSize[1] ?? null,
-                    'alt_text' => $request->alt_text ?? $service->image->alt_text,
-                    'title' => $request->image_title ?? $service->image->title,
-                ]);
-            } else {
-                // If there's no existing image, create a new media record
-                $media = Media::create([
-                    'path' => $newPath,
-                    'type' => 'image',
-                    'mime_type' => mime_content_type($filePath),
-                    'size_bytes' => filesize($filePath),
-                    'width' => $imageSize[0] ?? null,
-                    'height' => $imageSize[1] ?? null,
-                    'alt_text' => $request->alt_text ?? 'Service image',
-                    'title' => $request->image_title ?? 'Service image',
-                ]);
-
-                // Link the new media to the service
-                $service->image_media_id = $media->id;
+            $width = null;
+            $height = null;
+            if ($mediaType === 'image') {
+                $imageSize = getimagesize($filePath);
+                $width = $imageSize[0] ?? null;
+                $height = $imageSize[1] ?? null;
             }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Always Create a New Media Row
+            |--------------------------------------------------------------------------
+            | image_media_id can be shared with another record, so mutating the
+            | existing Media row in place would silently change that other
+            | record's image/video too. Always create a fresh row and just
+            | repoint this service's image_media_id at it.
+            */
+            $media = Media::create([
+                'path' => $newPath,
+                'type' => $mediaType,
+                'mime_type' => $mimeType,
+                'size_bytes' => filesize($filePath),
+                'width' => $width,
+                'height' => $height,
+                'alt_text' => $request->alt_text ?? ($service->image->alt_text ?? 'Service image'),
+                'title' => $request->image_title ?? ($service->image->title ?? 'Service image'),
+            ]);
+
+            $service->image_media_id = $media->id;
         } elseif ($service->image) {
             // If no image is uploaded, update image metadata only
             $service->image->update([
