@@ -20,7 +20,7 @@ class ContactFormSubmitted extends Mailable
     {
         return $this
             ->from('noreply@pnehomes.com', 'CVG CMS')
-            ->subject('New Contact Form Submission - ' . $this->submission->full_name)
+            ->subject('New CVG Customer Inquiry - ' . $this->submission->full_name)
             ->view('emails.contact-submission')
             ->with([
                 'submission' => $this->submission,
