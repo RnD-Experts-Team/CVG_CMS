@@ -5,7 +5,6 @@ namespace App\Services\AdminAuthCMS;
 use App\Models\Media;
 use App\Models\ServicesSection;
 use App\Traits\UploadImage;
-use Illuminate\Support\Facades\Storage;
 
 class ServicesSectionService
 {
@@ -71,40 +70,27 @@ class ServicesSectionService
             $filePath = storage_path('app/public/'.$newPath);
             $imageSize = getimagesize($filePath);
 
-            // If the service section has an existing image, delete the old one
-            if ($section->image) {
+            /*
+            |--------------------------------------------------------------------------
+            | Always Create a New Media Row
+            |--------------------------------------------------------------------------
+            | image_media_id can be shared with another section (e.g. Process),
+            | so mutating the existing Media row in place would silently change
+            | that other section's image too. Always create a fresh row and just
+            | repoint this section's image_media_id at it.
+            */
+            $media = Media::create([
+                'path' => $newPath,
+                'type' => 'image',
+                'mime_type' => mime_content_type($filePath),
+                'size_bytes' => filesize($filePath),
+                'width' => $imageSize[0],
+                'height' => $imageSize[1],
+                'alt_text' => $request->alt_text ?? ($section->image->alt_text ?? 'Service image'),
+                'title' => $request->image_title ?? ($section->image->title ?? 'Service image'),
+            ]);
 
-                // Delete old image from storage
-                if (Storage::disk('public')->exists($section->image->path)) {
-                    Storage::disk('public')->delete($section->image->path);
-                }
-
-                // Update existing media record with new image details
-                $section->image->update([
-                    'path' => $newPath,
-                    'mime_type' => mime_content_type($filePath),
-                    'size_bytes' => filesize($filePath),
-                    'width' => $imageSize[0],
-                    'height' => $imageSize[1],
-                    'alt_text' => $request->alt_text ?? $section->image->alt_text,
-                    'title' => $request->image_title ?? $section->image->title,
-                ]);
-
-            } else {
-                // First-time image upload if no previous image exists
-                $media = Media::create([
-                    'path' => $newPath,
-                    'type' => 'image',
-                    'mime_type' => mime_content_type($filePath),
-                    'size_bytes' => filesize($filePath),
-                    'width' => $imageSize[0],
-                    'height' => $imageSize[1],
-                    'alt_text' => $request->alt_text ?? 'Service image',
-                    'title' => $request->image_title ?? 'Service image',
-                ]);
-
-                $section->image_media_id = $media->id;
-            }
+            $section->image_media_id = $media->id;
         } elseif ($section->image) {
             // If no image is uploaded, update image metadata only
             $section->image->update([

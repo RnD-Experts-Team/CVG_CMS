@@ -2,6 +2,7 @@
 
 namespace App\Services\PublicCMS;
 
+use App\Mail\ContactFormSubmitted;
 use App\Models\AboutSection;
 use App\Models\Category;
 use App\Models\ContactSection;
@@ -10,6 +11,8 @@ use App\Models\FooterContact;
 use App\Models\FooterSocialLink;
 use App\Models\HeroSection;
 use App\Models\ProcessSection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Project;
 use App\Models\ProjectsSection;
 use App\Models\Service;
@@ -209,7 +212,7 @@ class PublicCMSService
         if ($type) {
             $query->where('type', $type);
         }
-        $services = $query->paginate(5);
+        $services = $query->paginate(100);
 
         // Return the response with the required structure
         return [
@@ -250,6 +253,17 @@ class PublicCMSService
             'ip_address' => $ipAddress ?? null,
             'user_agent' => $userAgent ?? null,
         ]);
+
+        // Notify the CVG team — a mail failure must never break the submission
+        // itself, since the record is already safely saved above.
+        try {
+            Mail::to('constructioncvg@gmail.com')->send(new ContactFormSubmitted($contactSubmission));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send contact form notification email', [
+                'submission_id' => $contactSubmission->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return ['data' => $contactSubmission, 'message' => 'Contact form submitted successfully'];
     }
